@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "include": ["**/*.spec.(ts|tsx)"],
+  "exclude": ["node_modules"],
+  "types": [
+    "jest",
+    "node",
+    "react"
+  ]
+}
