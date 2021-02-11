@@ -10,16 +10,30 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:mobtime.helloWorld"
+		"onView:mobtime-sidebar"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "mobtime.helloWorld",
-				"title": "Hello World"
-			}
-		]
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "mobtime-sidebar-view",
+					"title": "MobTime",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"mobtime-sidebar-view":[
+				{
+					"type": "webview",
+					"id": "mobtime-sidebar",
+					"name": "MobTime",
+					"icon": "media/icon.svg",
+					"contextualTitle": "MobTime"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run package",
