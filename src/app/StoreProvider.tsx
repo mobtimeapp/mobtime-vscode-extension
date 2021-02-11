@@ -1,21 +1,25 @@
-import { createContext, Dispatch, Reducer, useReducer } from "react";
-
+import React, { createContext, Dispatch, Reducer, useContext, useEffect, useMemo, useReducer } from "react";
 interface Store {
   timerName?: string;
 }
-
-const initialStore: Store = {
-  timerName: undefined
-};
 
 type Actions = {
   type: 'SET_NAME',
   name: string
 };
 
+type VSCodeAPI = <T = unknown>() => {
+  getState: () => T;
+  setState: (data: T) => void;
+  postMessage: (msg: unknown) => void;
+};
+
+declare var acquireVsCodeApi: VSCodeAPI;
+
 const StoreContext = createContext({} as {
   state: Store,
-  dispatch: Dispatch<Actions>
+  dispatch: Dispatch<Actions>,
+  vscodeApi: ReturnType<VSCodeAPI>
 });
 
 const reduce: Reducer<Store, Actions> = (state, action) => {
@@ -25,10 +29,18 @@ const reduce: Reducer<Store, Actions> = (state, action) => {
   }
 };
 
+export const useStore = () => useContext(StoreContext);
+
 export const StoreProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(reduce, initialStore);
+  const vscodeApi = useMemo(() => acquireVsCodeApi(), []);
+  const [state, dispatch] = useReducer(reduce, (vscodeApi.getState() || {}) as Store);
+
+  useEffect(() => {
+    vscodeApi.setState(state);
+  }, [state]);
+
   return (
-    <StoreContext.Provider value={{ state, dispatch }}>
+    <StoreContext.Provider value={{ state, dispatch, vscodeApi }}>
       {children}
     </StoreContext.Provider>
   );
