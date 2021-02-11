@@ -4,9 +4,8 @@ import { useStore } from './StoreProvider';
 import { parseMobTimeName } from './utils/timerNameParser';
 
 export const App: React.FC = () => {
-  const { state, dispatch } = useStore();
+  const { state, dispatch, socket } = useStore();
   const [timerName, setTimerName] = useState<string | undefined>(undefined);
-  const [socket, setSocket] = useState<WebSocket | undefined>(undefined);
 
   const handleInputBlur: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { value } = e.target;
@@ -15,43 +14,14 @@ export const App: React.FC = () => {
 
   const handleConnection = useCallback(() => {
     if (timerName) {
-      dispatch({ type: 'SET_NAME', name: timerName });
+      dispatch({ type: 'CONNECT', name: timerName });
     }
   }, [dispatch, timerName]);
 
   const handleDisconnection = useCallback(() => {
-    dispatch({ type: 'SET_NAME', name: undefined });
-    socket.close();
+    dispatch({ type: 'DISCONNECT' });
+    setTimerName('');
   }, [dispatch, timerName]);
-
-  useEffect(() => {
-    if (state.timerName) {
-      const socket = new WebSocket(`wss://mobtime.vehikl.com/${timerName}`);
-      setSocket(socket);
-      return;
-    }
-    setSocket(undefined);
-  }, [state?.timerName]);
-
-  useEffect(() => {
-    if (socket) {
-      // Connection opened
-      socket.addEventListener('open', function (event) {
-        socket.send(JSON.stringify({ type: 'client:new' }));
-        console.log('connected');
-      });
-
-      // Listen for messages
-      socket.addEventListener('message', function (event) {
-        console.log('Message from server ', event.data);
-      });
-    }
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [socket]);
 
   return !socket ? (
     <>
@@ -70,6 +40,7 @@ export const App: React.FC = () => {
     </>
   ) : (<div>
     Connected
+    {JSON.stringify(state)}
     <Button
       onClick={handleDisconnection}
     >
