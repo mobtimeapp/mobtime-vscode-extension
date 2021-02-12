@@ -18,19 +18,19 @@ export const Timer: React.FC = () => {
   useEffect(() => {
     switch (timerAction) {
       case 'start':
-        setTime(timerDuration);
-        clearInterval(timer.current);
+        setTime(timerDuration || 0);
+        timer.current && clearInterval(timer.current);
         timer.current = setInterval(() => {
           setTime(countdown);
         }, 1000);
         break;
       case 'pause':
-        setTime(timerDuration);
-        clearInterval(timer.current);
+        setTime(timerDuration || 0);
+        timer.current && clearInterval(timer.current);
         break;
       case 'complete':
         setTime(0);
-        clearInterval(timer.current);
+        timer.current && clearInterval(timer.current);
         break;
     }
   }, [timerDuration, timerAction]);
@@ -40,7 +40,7 @@ export const Timer: React.FC = () => {
   }, [dispatch, time]);
 
   const handleStart = useCallback(() => {
-    dispatch({ type: 'timer:start', timerDuration: time ? time - 1000 : settings.duration });
+    dispatch({ type: 'timer:start', timerDuration: time ? time - 1000 : settings?.duration });
   }, [dispatch, time, settings]);
 
   const handleClear = useCallback(() => {

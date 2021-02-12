@@ -2,6 +2,7 @@ import React, { ChangeEventHandler, useCallback, useState } from 'react';
 import { useStore } from '../StoreProvider';
 import { parseMobTimeName } from '../utils/timerNameParser';
 import { Button } from './UI/Button';
+import { VscDebugDisconnect } from 'react-icons/vsc';
 
 export const Connector: React.FC = () => {
   const { dispatch } = useStore();
@@ -29,7 +30,8 @@ export const Connector: React.FC = () => {
           disabled={!timerName}
           onClick={handleConnection}
         >
-          Connect - {timerName}
+          <VscDebugDisconnect size={20}/> 
+          <p>Connect - {timerName}</p>
         </Button>
       )}
     </>

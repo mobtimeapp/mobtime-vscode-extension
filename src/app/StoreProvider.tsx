@@ -1,5 +1,11 @@
 import React, { createContext, Dispatch, Reducer, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
-interface Store {
+
+export interface GoalType {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+export interface Store {
   socket?: WebSocket;
   timerName?: string;
   isOwner?: boolean;
@@ -7,11 +13,7 @@ interface Store {
     id: string;
     name: string;
   }[];
-  goals?: {
-    id: string;
-    text: string;
-    completed: boolean;
-  }[];
+  goals?: GoalType[];
   settings?: {
     mobOrder: string,
     duration: number;
@@ -153,7 +155,8 @@ export const StoreProvider: React.FC = ({ children }) => {
           socket.close();
         }
       };
-    } 
+    }
+    return;
   }, [socket, dispatch]);
 
   const userDispatcher = useCallback((action: Actions) => {
