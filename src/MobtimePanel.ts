@@ -1,36 +1,63 @@
 import * as vscode from "vscode";
-
+import * as Websocket from "ws";
+import { Actions, Store } from "./app/shared/eventTypes";
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   _doc?: vscode.TextDocument;
+  socket?: Websocket;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
-  public resolveWebviewView(webviewView: vscode.WebviewView) {
-    this._view = webviewView;
+  public connectToSocket (name?: string) {
+    if (name) {
+      this.socket = new Websocket(`wss://mobtime.vehikl.com/${name}`);
+      this.socket.on("open", () => {
+        this.socket?.send(JSON.stringify({ type: 'client:new' }));
+        this.socket?.on('message', e => {
+          this._view?.webview.postMessage(JSON.parse(e.toString()));
+        });
+      });
+    }
+  }
 
-    webviewView.webview.options = {
+  public resolveWebviewView(panel: vscode.WebviewView, context: { state: Store }) {
+    this.connectToSocket(context.state?.timerName);
+    this._view = panel;
+
+    panel.webview.options = {
       // Allow scripts in the webview
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    panel.webview.html = this._getHtmlForWebview(panel.webview);
 
-    webviewView.webview.onDidReceiveMessage(async (data) => {
+    panel.webview.onDidReceiveMessage(async (data: Actions) => {
       switch (data.type) {
-        case "onInfo": {
-          if (!data.value) {
+        case "INFO": {
+          if (!data.message) {
             return;
           }
-          vscode.window.showInformationMessage(data.value);
+          vscode.window.showInformationMessage(data.message);
           break;
         }
-        case "onError": {
-          if (!data.value) {
+        case "ERROR": {
+          if (!data.message) {
             return;
           }
-          vscode.window.showErrorMessage(data.value);
+          vscode.window.showErrorMessage(data.message);
+          break;
+        }
+        case "CONNECT": {
+          this.connectToSocket(data.name);
+          break;
+        }
+        case "DISCONNECT": {
+          this.socket?.close();
+          break;
+        }
+        default: {
+          this.socket?.send(JSON.stringify(data));
           break;
         }
       }

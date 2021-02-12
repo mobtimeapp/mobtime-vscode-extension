@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { GoalType, useStore } from '../StoreProvider';
+import { useStore } from '../StoreProvider';
 import styled from '@emotion/styled';
 import { FiCheckCircle, FiCircle } from 'react-icons/fi';
+import { GoalType } from '../shared/eventTypes';
 
 interface GoalProps extends Partial<GoalType> {
   placeholder: string

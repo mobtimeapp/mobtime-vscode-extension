@@ -40,7 +40,7 @@ const tabs = [
 ];
 
 export const App: React.FC = () => {
-  const { dispatch, socket, state: { activeTabIndex } } = useStore();
+  const { dispatch, state: { activeTabIndex, timerName } } = useStore();
 
   const handleDisconnection = useCallback(() => {
     dispatch({ type: 'DISCONNECT' });
@@ -53,7 +53,7 @@ export const App: React.FC = () => {
     });
   }, [dispatch]);
 
-  return !socket ? (
+  return !timerName ? (
     <Connector />
   ) : (
     <DashbordView>

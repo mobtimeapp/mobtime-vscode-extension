@@ -1,79 +1,5 @@
 import React, { createContext, Dispatch, Reducer, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
-
-export interface GoalType {
-  id: string;
-  text: string;
-  completed: boolean;
-}
-export interface Store {
-  socket?: WebSocket;
-  timerName?: string;
-  isOwner?: boolean;
-  activeTabIndex?: number;
-  mob?: {
-    id: string;
-    name: string;
-  }[];
-  goals?: GoalType[];
-  settings?: {
-    mobOrder: string,
-    duration: number;
-  },
-  timerDuration?: number;
-  timerAction?: 'start' | 'pause' | 'complete';
-}
-
-type CONNECT = {
-  type: 'CONNECT',
-  name: Store['timerName']
-};
-
-type DISCONNECT = {
-  type: 'DISCONNECT'
-};
-
-type ACTIVE_TAB = {
-  type: 'ACTIVE_TAB',
-  index: Store['activeTabIndex']
-};
-
-type MOB_UPDATE = {
-  type: 'mob:update',
-  mob: Store['mob']
-};
-
-type GOALS_UPDATE = {
-  type: 'goals:update',
-  goals: Store['goals']
-};
-
-type SETTINGS_UPDATE = {
-  type: 'settings:update',
-  settings: Store['settings']
-};
-
-type TIMER_START = {
-  type: 'timer:start',
-  timerDuration: Store['timerDuration']
-};
-
-type TIMER_PAUSE = {
-  type: 'timer:pause',
-  timerDuration: Store['timerDuration']
-};
-
-type TIMER_COMPLETE = {
-  type: 'timer:complete',
-  timerDuration: 0
-};
-
-type Actions = CONNECT | DISCONNECT | ACTIVE_TAB | MOB_UPDATE | GOALS_UPDATE | SETTINGS_UPDATE | TIMER_START | TIMER_PAUSE | TIMER_COMPLETE;
-
-type VSCodeAPI = <T = unknown>() => {
-  getState: () => T;
-  setState: (data: T) => void;
-  postMessage: (msg: unknown) => void;
-};
+import { VSCodeAPI, Store, Actions } from './shared/eventTypes';
 
 declare var acquireVsCodeApi: VSCodeAPI;
 
@@ -81,24 +7,17 @@ const StoreContext = createContext({} as {
   state: Store,
   dispatch: Dispatch<Actions>,
   vscodeApi: ReturnType<VSCodeAPI>,
-  socket?: WebSocket
 });
 
 const reduce: Reducer<Store, Actions> = (state, action) => {
   switch (action.type) {
     case 'CONNECT':
-      if (state.socket) {
-        state.socket.close();
-      }
       return {
         ...state, 
         timerName: action.name,
         socket: new WebSocket(`wss://mobtime.vehikl.com/${action.name}`),
       };
     case 'DISCONNECT':
-      if (state.socket) {
-        state.socket.close();
-      }
       return { };
     case 'ACTIVE_TAB':
       return {
@@ -133,52 +52,32 @@ export const useStore = () => useContext(StoreContext);
 
 export const StoreProvider: React.FC = ({ children }) => {
   const vscodeApi = useMemo(() => acquireVsCodeApi(), []);
-  const [{ socket, ...state }, dispatch] = useReducer(
+  const [state, dispatch] = useReducer(
     reduce,
     (vscodeApi.getState() || {}) as Store
   );
 
   useEffect(() => {
+    const messageHandler = (e: MessageEvent<Actions>) => {
+      dispatch(e.data);
+    };
+    window.addEventListener('message', messageHandler);
+    return () => {
+      window.removeEventListener('message', messageHandler);
+    };
+  }, []);
+
+  const userDispatcher = useCallback((action: Actions) => {
+    dispatch(action);
+    vscodeApi.postMessage(action);
+  }, [dispatch, vscodeApi]);
+  
+  useEffect(() => {
     vscodeApi.setState(state);
   }, [state]);
 
-  useEffect(() => {
-    if (!socket && state.timerName) {
-      dispatch({
-        type: 'CONNECT',
-        name: state.timerName
-      });
-    } 
-  }, [socket && state.timerName, dispatch]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.addEventListener('open', () => {
-        socket.send(JSON.stringify({ type: 'client:new' }));
-      });
-
-      socket.addEventListener('message', (event) => {
-        dispatch(JSON.parse(event.data));
-      });
-
-      return () => {
-        if (socket) {
-          socket.close();
-        }
-      };
-    }
-    return;
-  }, [socket, dispatch]);
-
-  const userDispatcher = useCallback((action: Actions) => {
-    if (!['CONNECT', 'DISCONNECT'].includes(action.type) && socket) {
-      socket.send(JSON.stringify(action));
-    }
-    dispatch(action);
-  }, [dispatch, socket]);
-
   return (
-    <StoreContext.Provider value={{ state, socket, dispatch: userDispatcher, vscodeApi }}>
+    <StoreContext.Provider value={{ state, dispatch: userDispatcher, vscodeApi }}>
       {children}
     </StoreContext.Provider>
   );

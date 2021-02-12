@@ -15,7 +15,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*.tsx"],
+  "include": ["**/*.tsx","**/*.ts"],
   "exclude": [
     "node_modules",
     "**/*.spec.tsx"

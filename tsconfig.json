@@ -11,6 +11,10 @@
 		"strict": true,
     "allowSyntheticDefaultImports": true
 	},
+	"include": [
+		"src/app/shared/**/*.ts",
+		"src/**/*.ts"
+	],
 	"exclude": [
 		"node_modules",
 		".vscode-test",
