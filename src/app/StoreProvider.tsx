@@ -9,6 +9,7 @@ export interface Store {
   socket?: WebSocket;
   timerName?: string;
   isOwner?: boolean;
+  activeTabIndex?: number;
   mob?: {
     id: string;
     name: string;
@@ -24,11 +25,16 @@ export interface Store {
 
 type CONNECT = {
   type: 'CONNECT',
-  name: string
+  name: Store['timerName']
 };
 
 type DISCONNECT = {
   type: 'DISCONNECT'
+};
+
+type ACTIVE_TAB = {
+  type: 'ACTIVE_TAB',
+  index: Store['activeTabIndex']
 };
 
 type MOB_UPDATE = {
@@ -61,7 +67,7 @@ type TIMER_COMPLETE = {
   timerDuration: 0
 };
 
-type Actions = CONNECT | DISCONNECT | MOB_UPDATE | GOALS_UPDATE | SETTINGS_UPDATE | TIMER_START | TIMER_PAUSE | TIMER_COMPLETE;
+type Actions = CONNECT | DISCONNECT | ACTIVE_TAB | MOB_UPDATE | GOALS_UPDATE | SETTINGS_UPDATE | TIMER_START | TIMER_PAUSE | TIMER_COMPLETE;
 
 type VSCodeAPI = <T = unknown>() => {
   getState: () => T;
@@ -94,6 +100,11 @@ const reduce: Reducer<Store, Actions> = (state, action) => {
         state.socket.close();
       }
       return { };
+    case 'ACTIVE_TAB':
+      return {
+        ...state,
+        activeTabIndex: action.index
+      };
     case 'timer:pause':
       return {
         ...state,
