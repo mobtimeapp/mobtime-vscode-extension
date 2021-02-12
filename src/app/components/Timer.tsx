@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../StoreProvider';
 import { millisToMinutes } from '../utils/timeConverter';
+import { Clock } from './Clock';
 import { Button } from './UI/Button';
 
 export const Timer: React.FC = () => {
@@ -49,7 +50,10 @@ export const Timer: React.FC = () => {
 
   return (
     <>
-      <h1>{millisToMinutes(time)}</h1>
+      <Clock 
+        percentage={timerDuration ? time * 100 / settings?.duration || timerDuration : 0}
+        time={millisToMinutes(time)}
+      />
       <div style={{ display: 'flex' }}>
         { timerAction !== 'start' && (
           <Button
