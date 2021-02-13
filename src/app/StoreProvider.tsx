@@ -1,7 +1,18 @@
-import React, { createContext, Dispatch, Reducer, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
+import React, { 
+  createContext, 
+  Dispatch, 
+  useCallback, 
+  useContext, 
+  useEffect, 
+  useReducer, 
+  useState 
+} from "react";
+import { Loader } from "./components/UI/Loader";
+import { reducerApp } from "./shared/actionReducer";
 import { VSCodeAPI, Store, Actions } from './shared/eventTypes';
 
-declare var acquireVsCodeApi: VSCodeAPI;
+declare var vscodeApi: ReturnType<VSCodeAPI>;
+declare var storeData: string;
 
 const StoreContext = createContext({} as {
   state: Store,
@@ -9,56 +20,17 @@ const StoreContext = createContext({} as {
   vscodeApi: ReturnType<VSCodeAPI>,
 });
 
-const reduce: Reducer<Store, Actions> = (state, action) => {
-  switch (action.type) {
-    case 'CONNECT':
-      return {
-        ...state, 
-        timerName: action.name,
-        socket: new WebSocket(`wss://mobtime.vehikl.com/${action.name}`),
-      };
-    case 'DISCONNECT':
-      return { };
-    case 'ACTIVE_TAB':
-      return {
-        ...state,
-        activeTabIndex: action.index
-      };
-    case 'timer:pause':
-      return {
-        ...state,
-        timerAction: 'pause',
-        timerDuration: action.timerDuration
-      };
-    case 'timer:start':
-      return {
-        ...state,
-        timerAction: 'start',
-        timerDuration: action.timerDuration
-      };
-    case 'timer:complete':
-      return {
-        ...state,
-        timerAction: 'complete',
-        timerDuration: action.timerDuration
-      };
-    default: 
-      const { type, ...data } = action;
-      return {...state, ...data };
-  }
-};
-
 export const useStore = () => useContext(StoreContext);
 
 export const StoreProvider: React.FC = ({ children }) => {
-  const vscodeApi = useMemo(() => acquireVsCodeApi(), []);
-  const [state, dispatch] = useReducer(
-    reduce,
-    (vscodeApi.getState() || {}) as Store
-  );
+  const [state, dispatch] = useReducer(reducerApp, (JSON.parse(storeData) || {}));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const messageHandler = (e: MessageEvent<Actions>) => {
+      if (e.data.type === 'timer:ownership') {
+        setLoading(false);
+      }
       dispatch(e.data);
     };
     window.addEventListener('message', messageHandler);
@@ -68,17 +40,17 @@ export const StoreProvider: React.FC = ({ children }) => {
   }, []);
 
   const userDispatcher = useCallback((action: Actions) => {
+    if (action.type === 'CONNECT' && !state.timerName) {
+      setLoading(true);
+    }
     dispatch(action);
     vscodeApi.postMessage(action);
-  }, [dispatch, vscodeApi]);
-  
-  useEffect(() => {
-    vscodeApi.setState(state);
-  }, [state]);
+  }, [dispatch, vscodeApi, state.timerName]);
 
   return (
     <StoreContext.Provider value={{ state, dispatch: userDispatcher, vscodeApi }}>
-      {children}
+      {loading && <Loader />}
+      {!loading && children}
     </StoreContext.Provider>
   );
 };

@@ -1,23 +1,23 @@
 import * as vscode from 'vscode';
+import { Store } from './app/shared/eventTypes';
 import { SidebarProvider } from './MobtimePanel';
 
-const MOBTIME_NAME_KEY = 'mobtime-name';
+const MOBTIME_STORE_KEY = 'mobtime-store';
 
 export function activate(context: vscode.ExtensionContext) {
-	const updateMobtimeName = (name?: string) => {
-		context.globalState.update(MOBTIME_NAME_KEY, name);
+	const updateStore = (store?: Store) => {
+		context.globalState.update(MOBTIME_STORE_KEY, JSON.stringify(store));
 	};
-
 	const sidebarProvider = new SidebarProvider(
-		updateMobtimeName,
+		updateStore,
 		context.extensionUri,
-		context.globalState.get(MOBTIME_NAME_KEY)
+		JSON.parse(context.globalState.get(MOBTIME_STORE_KEY) || '{}')
 	);
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
 			"mobtime-sidebar",
-			sidebarProvider
+			sidebarProvider,
 		)
 	);
 

@@ -1,36 +1,47 @@
 import * as vscode from "vscode";
 import { Disposable } from "vscode";
 import * as Websocket from "ws";
-import { Actions } from "./app/shared/eventTypes";
+import { Actions, Store } from "./app/shared/eventTypes";
+import { reducerApp } from "./app/shared/actionReducer";
 import { millisToMinutes } from './app/shared/timeConverter';
 
-type UpdateMobtimeFn = (timerName?: string) => void;
+type updateStore = (store: Store) => void;
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   socket?: Websocket;
-  updateMobTimeName: UpdateMobtimeFn;
+  updateStore: updateStore;
   time?: number;
   timer?: NodeJS.Timeout;
   statusBar?: Disposable;
+  store?: Store;
 
-  constructor(updateMobTimeName: UpdateMobtimeFn, private readonly _extensionUri: vscode.Uri, mobTimeName?: string) {
-    this.updateMobTimeName = updateMobTimeName;
-    this.connectToSocket(mobTimeName);
+  constructor(updateStore: updateStore, private readonly _extensionUri: vscode.Uri, store?: Store) {
+    this.updateStore = updateStore;
+    this.store = store;
+    this.connectToSocket();
   }
 
-  public connectToSocket (name?: string) {
-    if (name) {
+  private sendAction (action: Actions) {
+    this.socket?.send(JSON.stringify(action));
+  }
+
+  private sendUIAction (action: Actions) {
+    this._view?.webview.postMessage(action);
+  }
+
+  private connectToSocket () {
+    if (this.store?.timerName) {
       if (this.socket) {
         this.socket.url;
       }
-      this.socket = new Websocket(`wss://mobtime.vehikl.com/${name}`);
+      this.socket = new Websocket(`wss://mobtime.vehikl.com/${this.store.timerName}`);
       this.socket.on("open", () => {
-        this.socket?.send(JSON.stringify({ type: 'client:new' }));
+        this.sendAction({ type: 'client:new' });
         this.socket?.on('message', e => {
           const action = JSON.parse(e.toString());
-          this.timerActions(action);
-          this._view?.webview.postMessage(action);
+          this.timerActionsHandlers(action);
+          this.incomingActionsHandlers(action);
         });
       });
     }
@@ -38,52 +49,27 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   public resolveWebviewView(panel: vscode.WebviewView) {
     this._view = panel;
-
     panel.webview.options = {
-      // Allow scripts in the webview
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
 
     panel.webview.html = this._getHtmlForWebview(panel.webview);
 
-    panel.webview.onDidReceiveMessage(async (data: Actions) => {
-      switch (data.type) {
-        case "INFO": {
-          if (!data.message) {
-            return;
-          }
-          vscode.window.showInformationMessage(data.message);
-          break;
-        }
-        case "ERROR": {
-          if (!data.message) {
-            return;
-          }
-          vscode.window.showErrorMessage(data.message);
-          break;
-        }
-        case "CONNECT": {
-          this.updateMobTimeName(data.name);
-          this.connectToSocket(data.name);
-          break;
-        }
-        case "DISCONNECT": {
-          this.updateMobTimeName(undefined);
-          this.socket?.close();
-          break;
-        }
-        default: {
-          this.timerActions(data);
-          this.socket?.send(JSON.stringify(data));
-          break;
-        }
+    panel.onDidChangeVisibility(() => {
+      if (panel.visible) {
+        (this._view || panel).webview.html = this._getHtmlForWebview(panel.webview);
       }
+    });
+
+    panel.webview.onDidReceiveMessage((action) => {
+      this.outgoingActionsHandlers(action);
     });
   }
 
   public revive(panel: vscode.WebviewView) {
     this._view = panel;
+    this.store;
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -109,12 +95,70 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			</head>
       <body>
         <div id="root"></div>
+        <script>
+          const vscodeApi = acquireVsCodeApi();
+          const storeData = '${JSON.stringify(this.store)}';
+        </script>
         <script src="${scriptUri}"></script>
 			</body>
 			</html>`;
   }
 
-  public timerActions (actions: Actions) {
+  private incomingActionsHandlers (action: Actions) {
+    this.store = reducerApp(this.store || {}, action);
+    this.timerActionsHandlers(action);
+    switch (action.type) {
+      case 'client:new':
+        if (this.store.isOwner) {
+          this.sendAction({
+            type: 'settings:update',
+            settings: this.store.settings
+          });
+          this.sendAction({
+            type: 'mob:update',
+            mob: this.store.mob
+          });
+          this.sendAction({
+            type: 'goals:update',
+            goals: this.store.goals
+          });
+        }
+        break;
+      default:
+        this.sendUIAction(action);
+        break;
+    }
+    this.updateStore(this.store);
+  }
+
+  private outgoingActionsHandlers (action: Actions) {
+    this.store = reducerApp(this.store || {}, action);
+    this.timerActionsHandlers(action);
+    switch (action.type) {
+      case "CONNECT": {
+        this.store = {
+          ...this.store,
+          timerName: action.name
+        };
+        this.connectToSocket();
+        break;
+      }
+      case "DISCONNECT": {
+        this.socket?.close();
+        this.store = {};
+        break;
+      }
+      case "ACTIVE_TAB": {
+        break;
+      }
+      default:
+        this.sendAction(action);
+        break;
+    }
+    this.updateStore(this.store);
+  }
+
+  private timerActionsHandlers (actions: Actions) {
     switch (actions.type) {
       case "timer:start": {
         this.time = actions.timerDuration;
@@ -128,6 +172,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             vscode.window.setStatusBarMessage(`$(watch) Mobtime : ${millisToMinutes(newTime)}`);
             if (this.time <= 0 && this.timer) {
               clearInterval(this.timer);
+              const [navigator, ...otherMobs] = (this.store?.mob || []);
+              this.sendAction({
+                type: "mob:update",
+                mob: [...otherMobs, navigator],
+              });
+              this.sendUIAction({
+                type: "mob:update",
+                mob: [...otherMobs, navigator],
+              });
               this.socket?.send(JSON.stringify({ type: "timer:complete" } as Actions));
               vscode.window.showInformationMessage("!! Timer !!");
               vscode.window.setStatusBarMessage("");
@@ -144,7 +197,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         }
         break;
       }
-
       case "timer:complete": {
         if (this.timer) {
           clearInterval(this.timer);

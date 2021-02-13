@@ -44,6 +44,15 @@ type ACTIVE_TAB = {
   index: Store['activeTabIndex']
 };
 
+type TIMER_OWNER = {
+  type: 'timer:ownership',
+  isOwner: boolean
+};
+
+type NEW_CLIENT = {
+  type: 'client:new',
+};
+
 type MOB_UPDATE = {
   type: 'mob:update',
   mob: Store['mob']
@@ -76,13 +85,15 @@ type TIMER_COMPLETE = {
 
 export type Actions = CONNECT 
   | DISCONNECT 
-  | ACTIVE_TAB 
+  | ACTIVE_TAB
+  | NEW_CLIENT
   | MOB_UPDATE 
   | GOALS_UPDATE 
   | SETTINGS_UPDATE 
+  | TIMER_OWNER
   | TIMER_START 
   | TIMER_PAUSE 
-  | TIMER_COMPLETE 
+  | TIMER_COMPLETE
   | INFO 
   | ERROR;
 
