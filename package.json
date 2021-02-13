@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:mobtime-sidebar"
+    "onView:mobtime-sidebar",
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {

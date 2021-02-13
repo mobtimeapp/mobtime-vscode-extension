@@ -22,7 +22,7 @@ export interface Store {
 
 type CONNECT = {
   type: 'CONNECT',
-  name: Store['timerName']
+  name: string
 };
 
 type DISCONNECT = {

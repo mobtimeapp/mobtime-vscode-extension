@@ -1,27 +1,42 @@
 import * as vscode from "vscode";
+import { Disposable } from "vscode";
 import * as Websocket from "ws";
-import { Actions, Store } from "./app/shared/eventTypes";
+import { Actions } from "./app/shared/eventTypes";
+import { millisToMinutes } from './app/shared/timeConverter';
+
+type UpdateMobtimeFn = (timerName?: string) => void;
+
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
-  _doc?: vscode.TextDocument;
   socket?: Websocket;
+  updateMobTimeName: UpdateMobtimeFn;
+  time?: number;
+  timer?: NodeJS.Timeout;
+  statusBar?: Disposable;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(updateMobTimeName: UpdateMobtimeFn, private readonly _extensionUri: vscode.Uri, mobTimeName?: string) {
+    this.updateMobTimeName = updateMobTimeName;
+    this.connectToSocket(mobTimeName);
+  }
 
   public connectToSocket (name?: string) {
     if (name) {
+      if (this.socket) {
+        this.socket.url;
+      }
       this.socket = new Websocket(`wss://mobtime.vehikl.com/${name}`);
       this.socket.on("open", () => {
         this.socket?.send(JSON.stringify({ type: 'client:new' }));
         this.socket?.on('message', e => {
-          this._view?.webview.postMessage(JSON.parse(e.toString()));
+          const action = JSON.parse(e.toString());
+          this.timerActions(action);
+          this._view?.webview.postMessage(action);
         });
       });
     }
   }
 
-  public resolveWebviewView(panel: vscode.WebviewView, context: { state: Store }) {
-    this.connectToSocket(context.state?.timerName);
+  public resolveWebviewView(panel: vscode.WebviewView) {
     this._view = panel;
 
     panel.webview.options = {
@@ -49,14 +64,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "CONNECT": {
+          this.updateMobTimeName(data.name);
           this.connectToSocket(data.name);
           break;
         }
         case "DISCONNECT": {
+          this.updateMobTimeName(undefined);
           this.socket?.close();
           break;
         }
         default: {
+          this.timerActions(data);
           this.socket?.send(JSON.stringify(data));
           break;
         }
@@ -94,5 +112,49 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         <script src="${scriptUri}"></script>
 			</body>
 			</html>`;
+  }
+
+  public timerActions (actions: Actions) {
+    switch (actions.type) {
+      case "timer:start": {
+        this.time = actions.timerDuration;
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => {
+          if (this.time) {
+            const newTime = this.time - 1000;
+            this.time = newTime;
+            vscode.window.setStatusBarMessage(`$(watch) Mobtime : ${millisToMinutes(newTime)}`);
+            if (this.time <= 0 && this.timer) {
+              clearInterval(this.timer);
+              this.socket?.send(JSON.stringify({ type: "timer:complete" } as Actions));
+              vscode.window.showInformationMessage("!! Timer !!");
+              vscode.window.setStatusBarMessage("");
+              vscode.window.setStatusBarMessage("$(getting-started-item-checked) Mobtime : Completed");
+            }
+          }
+        }, 1000);
+        break;
+      }
+      case "timer:pause": {
+        if (this.timer) {
+          clearInterval(this.timer);
+          vscode.window.setStatusBarMessage("$(debug-pause) Mobtime : Pause");
+        }
+        break;
+      }
+
+      case "timer:complete": {
+        if (this.timer) {
+          clearInterval(this.timer);
+          vscode.window.showInformationMessage("!! Timer !!");
+          vscode.window.setStatusBarMessage("$(getting-started-item-checked) Mobtime");
+        }
+        break;
+      }
+      default:
+        break;
+    }
   }
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../StoreProvider';
-import { millisToMinutes } from '../utils/timeConverter';
+import { millisToMinutes } from '../shared/timeConverter';
 import { Clock } from './Clock';
 import { Button } from './UI/Button';
 
@@ -10,7 +10,6 @@ export const Timer: React.FC = () => {
   const timer = useRef<NodeJS.Timeout>(null);
   const countdown = useCallback((time: number) => {
     if (time <= 0) {
-      dispatch({ type: 'timer:complete', timerDuration: 0 });
       return 0;
     }
     return time - 1000;
