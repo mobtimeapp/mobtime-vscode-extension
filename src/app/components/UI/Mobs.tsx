@@ -4,6 +4,7 @@ import { MobName } from './MobName';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
 import { VscThreeBars } from "react-icons/vsc";
 import styled from '@emotion/styled';
+import { motion } from 'framer-motion';
 
 interface MobsProps {
   mobs: Store['mob'];
@@ -81,9 +82,15 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                     >
-                      <div {...provided.dragHandleProps}>
-                        <VscThreeBars size={30}/>
-                      </div>
+                      <motion.div
+                        whileTap={{ scaleY: 0.5 }}
+                      >
+                        <div {...provided.dragHandleProps}>
+                          <VscThreeBars
+                            size={30}
+                          />
+                        </div>
+                      </motion.div>
                       <MobName 
                         name={mob.name} 
                         key={mob.id} 

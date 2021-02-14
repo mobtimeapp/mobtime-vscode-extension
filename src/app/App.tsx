@@ -17,6 +17,7 @@ const DashbordView = styled.div`
   grid-template-rows: 1fr auto;
   grid-template-columns: auto;
   height: 95vh;
+  overflow-x: hidden;
   :nth-child(1) {
     overflow-y: auto;
   }
@@ -74,13 +75,13 @@ export const App: React.FC = () => {
           setActiveIndex={handleActiveIndex}
         >
           <Overview />
+          <Mobs 
+            mobs={mob}
+            onUpdateMobs={handleMobUpdate}
+            order={settings?.mobOrder || ''}
+          />
         </Tabs>
       </div>
-      <Mobs 
-        mobs={mob}
-        onUpdateMobs={handleMobUpdate}
-        order={settings?.mobOrder || ''}
-      />
       <Button
         onClick={handleDisconnection}
       >

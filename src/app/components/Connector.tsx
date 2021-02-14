@@ -46,7 +46,7 @@ export const Connector: React.FC = () => {
             }}
             transition={{
               type: 'spring',
-              duration: 0.4
+              duration: 0.4,
             }}
           >
             <VscDebugDisconnect size={20}/> 
