@@ -12,7 +12,7 @@ export const Overview: React.FC = () => {
     settings?.mobOrder.split(',') || [], [settings?.mobOrder]);
 
   return (
-    <>
+    <div>
       <TitleContainer>
         <h3>
           <FiUsers
@@ -69,6 +69,6 @@ export const Overview: React.FC = () => {
         placeholder="A grate day would be..."
         {...(goals ? goals[1] : {})}
       />
-    </>
+    </div>
   );
 };

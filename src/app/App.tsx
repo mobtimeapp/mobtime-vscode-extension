@@ -7,7 +7,9 @@ import { Connector } from './components/Connector';
 import { Overview } from './components/Overview';
 import { Timer } from './components/Timer';
 import { Button } from './components/UI/Button';
+import { Mobs } from './components/UI/Mobs';
 import { Tabs } from './components/UI/Tabs';
+import { Store } from './shared/eventTypes';
 import { useStore } from './StoreProvider';
 
 const DashbordView = styled.div`
@@ -40,7 +42,7 @@ const tabs = [
 ];
 
 export const App: React.FC = () => {
-  const { dispatch, state: { activeTabIndex, timerName } } = useStore();
+  const { dispatch, state: { activeTabIndex, timerName, mob, settings } } = useStore();
 
   const handleDisconnection = useCallback(() => {
     dispatch({ type: 'DISCONNECT' });
@@ -50,6 +52,13 @@ export const App: React.FC = () => {
     dispatch({
       type: 'ACTIVE_TAB',
       index
+    });
+  }, [dispatch]);
+
+  const handleMobUpdate = useCallback((mob: Store['mob']) => {
+    dispatch({
+      type: 'mob:update',
+      mob
     });
   }, [dispatch]);
 
@@ -64,11 +73,14 @@ export const App: React.FC = () => {
           activeIndex={activeTabIndex || 0}
           setActiveIndex={handleActiveIndex}
         >
-          <div>
-            <Overview />
-          </div>
+          <Overview />
         </Tabs>
       </div>
+      <Mobs 
+        mobs={mob}
+        onUpdateMobs={handleMobUpdate}
+        order={settings?.mobOrder || ''}
+      />
       <Button
         onClick={handleDisconnection}
       >

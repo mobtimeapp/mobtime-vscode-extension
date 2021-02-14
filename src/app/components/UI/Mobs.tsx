@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
@@ -32,6 +32,9 @@ const MobNameWrapper = styled.div`
 
 export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
   const [draggedMobs, setDraggedMobs] = useState(mobs);
+  useEffect(() => {
+    setDraggedMobs(mobs);
+  }, [mobs]);
 
   const mappedMobs = useMemo(() => {
     const orders = order.split(',');
@@ -66,29 +69,32 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
   }, [onUpdateMobs, draggedMobs]);
 
   return (
-    <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
-      <Droppable droppableId="mobs">
-        {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef}>
-            {mappedMobs.map((mob, i) => (
-              <Draggable key={mob.id} draggableId={mob.id.toString()} index={i}>
-                {(provided) => (
-                  <MobNameWrapper 
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                  >
-                    <div {...provided.dragHandleProps}>
-                      <VscThreeBars size={30}/>
-                    </div>
-                    <MobName name={mob.name} key={mob.id} type={mob.type}/>
-                  </MobNameWrapper>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <div>
+      <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
+        <Droppable droppableId="mobs">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {mappedMobs.map((mob, i) => (
+                <Draggable key={mob.id} draggableId={mob.id.toString()} index={i}>
+                  {(provided) => (
+                    <MobNameWrapper 
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                    >
+                      <div {...provided.dragHandleProps}>
+                        <VscThreeBars size={30}/>
+                      </div>
+                      <MobName name={mob.name} key={mob.id} type={mob.type}/>
+                    </MobNameWrapper>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <input />
+    </div>
   );
 }

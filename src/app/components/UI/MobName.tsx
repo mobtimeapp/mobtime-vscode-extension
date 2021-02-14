@@ -22,12 +22,17 @@ export const MobName: React.FC<MobNameProps> = ({ type, name }) => (
         {type || 'Mob'}
       </strong>
     </motion.h3>
-    <h1 style={{ 
-      marginBottom: '20px',
-      opacity: name ? 1 : 0.5,
-      fontWeight: 700
-    }}>
+    <motion.h1
+      key={name+type}
+      initial={{ rotateX: -90, opacity: 0.5 }}
+      animate={{ rotateX: 0, opacity: 1 }}
+      style={{ 
+        marginBottom: '20px',
+        opacity: name ? 1 : 0.5,
+        fontWeight: 700
+      }}
+    >
       {name || 'Empty' }
-    </h1>
+    </motion.h1>
   </div>
 )
