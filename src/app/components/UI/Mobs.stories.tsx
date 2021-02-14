@@ -36,6 +36,14 @@ export const FullList: Story = () => {
       id: '12345',
       name: 'Test C'
     },
+    {
+      id: '123456',
+      name: 'Test D'
+    },
+    {
+      id: '1234567',
+      name: 'Test E'
+    },
   ]);
 
   return (
