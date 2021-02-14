@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { memo, useLayoutEffect, useRef } from 'react';
 import { IconType } from 'react-icons';
 
 interface TabsProps {
@@ -64,7 +64,7 @@ const TabHighlighter = styled.div`
 const Highlighter = motion.custom(TabHighlighter);
 const MotionTab = motion.custom(Tab);
 
-export const Tabs: React.FC<TabsProps> = ({
+export const Tabs: React.FC<TabsProps> = memo(({
   tabs,
   children,
   setActiveIndex,
@@ -100,8 +100,7 @@ export const Tabs: React.FC<TabsProps> = ({
           </MotionTab>
         ))}
       </TabsWrapper>
-      <Highlighter 
-        key={activeIndex}
+      <Highlighter
         initial={{
           width: '0%',
           marginLeft: `${((100/tabs.length) * previousActiveIndex.current) + 100/(tabs.length * 2)}%`
@@ -117,15 +116,16 @@ export const Tabs: React.FC<TabsProps> = ({
       />
       <TabsContainer>
         <div>
-          {children.map((tabContent, index) => (
-            <AnimatePresence key={index}>
-              {activeIndex === index && (
-                <motion.div 
+          <AnimatePresence>
+            {children.map((tabContent, index) => (
+              activeIndex === index && (
+                <motion.div
+                  key={index} 
                   initial={{
                     opacity: 0,
                   }}
                   animate={{
-                    opacity: [0, 1],
+                    opacity: 1,
                   }}
                   exit={{
                     opacity: 0,
@@ -133,11 +133,11 @@ export const Tabs: React.FC<TabsProps> = ({
                 >
                   {tabContent}
                 </motion.div>
-              )}
-            </AnimatePresence>
-          ))}
+              )
+            ))}
+          </AnimatePresence>
         </div>
       </TabsContainer>
     </>
   );
-};
+});

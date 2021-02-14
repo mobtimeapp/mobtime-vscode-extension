@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
 interface MobNameProps {
@@ -7,7 +7,7 @@ interface MobNameProps {
   index: number;
 }
 
-export const MobName: React.FC<MobNameProps> = ({ type, name, index }) => (
+export const MobName: React.FC<MobNameProps> = memo(({ type, name, index }) => (
   <div>
     <motion.h3
       key={type}
@@ -36,4 +36,4 @@ export const MobName: React.FC<MobNameProps> = ({ type, name, index }) => (
       {name || 'Empty' }
     </motion.h1>
   </div>
-)
+))

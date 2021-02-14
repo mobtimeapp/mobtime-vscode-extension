@@ -5,6 +5,7 @@ import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'r
 import { VscThreeBars } from "react-icons/vsc";
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
+import { NewMob } from './NewMob';
 
 interface MobsProps {
   mobs: Store['mob'];
@@ -69,6 +70,17 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
     }
   }, [onUpdateMobs, draggedMobs]);
 
+  const handleNewMob = useCallback((mob: Store['mob'][number]) => {
+    setDraggedMobs(mobs => {
+      const newMob = [
+        ...mobs,
+        mob
+      ];
+      onUpdateMobs(newMob);
+      return newMob;
+    });
+  }, []);
+
   return (
     <div>
       <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
@@ -105,7 +117,7 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
           )}
         </Droppable>
       </DragDropContext>
-      <input />
+      <NewMob onMobAdd={handleNewMob} />
     </div>
   );
 }

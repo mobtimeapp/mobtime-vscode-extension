@@ -61,7 +61,7 @@ export const App: React.FC = () => {
       type: 'mob:update',
       mob
     });
-  }, [dispatch]);
+  }, []);
 
   return !timerName ? (
     <Connector />
