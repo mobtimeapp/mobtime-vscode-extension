@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Store } from '../../shared/eventTypes';
-import { VscAdd } from 'react-icons/vsc';
+import { AiOutlineUserAdd } from 'react-icons/ai';
 import { Button } from "./Button";
 
 interface NewMobProps {
@@ -50,7 +50,7 @@ export const NewMob: React.FC<NewMobProps> = ({ onMobAdd }) =>{
           duration: 0.25
         }}
       >
-        <VscAdd />
+        <AiOutlineUserAdd />
         Add
       </MotionBtn>
     </div>

@@ -8,7 +8,7 @@ interface MobNameProps {
 }
 
 export const MobName: React.FC<MobNameProps> = memo(({ type, name, index }) => (
-  <div>
+  <div style={{ width: '100%' }}>
     <motion.h3
       key={type}
       initial={{ marginLeft: '-10%', opacity: 0 }}

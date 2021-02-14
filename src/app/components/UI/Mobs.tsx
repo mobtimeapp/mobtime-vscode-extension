@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
-import { VscThreeBars } from "react-icons/vsc";
+import { VscChevronDown, VscChevronUp, VscEdit, VscMenu, VscTrash } from "react-icons/vsc";
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { NewMob } from './NewMob';
+import { OptionsButton } from './OptionsButton';
 
 interface MobsProps {
   mobs: Store['mob'];
@@ -15,12 +16,13 @@ interface MobsProps {
 
 const MobNameWrapper = styled.div`
   display: flex;
+  width: '100%';
   align-items: center;
   h1 {
     margin-bottom: 0px !important;
   }
   margin-bottom: 24px;
-  svg {
+  .dragIcon {
     margin-right: 10px;
     opacity: 0.5;
     :hover {
@@ -41,7 +43,7 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
   const mappedMobs = useMemo(() => {
     const orders = order.split(',');
     return [...Array(Math.max(orders.length, draggedMobs.length))].map((_, i) => ({
-      id: draggedMobs[i]?.id || i,
+      id: (draggedMobs[i]?.id || i).toString(),
       name: draggedMobs[i]?.name,
       type: orders[i]
     }));
@@ -79,7 +81,15 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
       onUpdateMobs(newMob);
       return newMob;
     });
-  }, []);
+  }, [onUpdateMobs]);
+
+  const handleDelete = useCallback((mobId: string) => {
+    setDraggedMobs(mobs => {
+      const newMob = mobs.filter(({ id }) => id !== mobId);
+      onUpdateMobs(newMob);
+      return newMob;
+    });
+  }, [onUpdateMobs]);
 
   return (
     <div>
@@ -95,10 +105,12 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
                       {...provided.draggableProps}
                     >
                       <motion.div
+                        initial={{ scaleX: 0.75 }}
                         whileTap={{ scaleY: 0.5 }}
                       >
                         <div {...provided.dragHandleProps}>
-                          <VscThreeBars
+                          <VscMenu
+                            className="dragIcon"
                             size={30}
                           />
                         </div>
@@ -107,7 +119,33 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
                         name={mob.name} 
                         key={mob.id} 
                         index={i}
-                        type={mob.type}/>
+                        type={mob.type}
+                      />
+                      {mob.name && (
+                        <OptionsButton
+                          options={[
+                            {
+                              icon: VscChevronUp,
+                              onClick: () => {},
+                              hidden: i === 0
+                            },
+                            {
+                              icon: VscChevronDown,
+                              onClick: () => {},
+                              hidden: (i + 1) === mappedMobs.length
+                            },
+                            {
+                              icon: VscEdit,
+                              onClick: () => {},
+                            },
+                            {
+                              icon: VscTrash,
+                              onClick: () => handleDelete(mob.id),
+                              color: 'var(--vscode-charts-red)'
+                            },
+                          ]}
+                        />
+                      )}
                     </MobNameWrapper>
                   )}
                 </Draggable>
