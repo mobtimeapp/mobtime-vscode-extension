@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
-import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
 import { VscThreeBars } from "react-icons/vsc";
 import styled from '@emotion/styled';
 
@@ -31,27 +31,44 @@ const MobNameWrapper = styled.div`
 `;
 
 export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
+  const [draggedMobs, setDraggedMobs] = useState(mobs);
+
   const mappedMobs = useMemo(() => {
     const orders = order.split(',');
-    return [...Array(Math.max(orders.length, mobs.length))].map((_, i) => ({
-      id: mobs[i]?.id || i,
-      name: mobs[i]?.name,
+    return [...Array(Math.max(orders.length, draggedMobs.length))].map((_, i) => ({
+      id: draggedMobs[i]?.id || i,
+      name: draggedMobs[i]?.name,
       type: orders[i]
     }));
   }
-  ,[order, mobs]);
+  ,[order, draggedMobs]);
 
-  const handleDragEnd = useCallback((result: DropResult) => {
-    const newMobs = [...mobs];
-    const source = mobs[result.source.index];
-    const destination = mobs[result.destination.index];
-    newMobs[result.source.index] = destination;
-    newMobs[result.destination.index] = source;
-    onUpdateMobs(newMobs);
-  }, [onUpdateMobs, mobs]);
+  const handleDragUpdate = (result: DragUpdate) => {
+    if (
+      result.source
+      && result.destination
+    ) {
+      const newMobs = [...mobs];
+      const source = {...mobs[result.source.index]};
+      const destination ={...mobs[result.destination.index]};
+      newMobs[result.source.index] = destination;
+      newMobs[result.destination.index] = source;
+      setDraggedMobs(newMobs);
+    }
+  };
+
+  const handleDrag = useCallback((result: DropResult) => {
+    if (
+      result.source
+      && result.destination
+      && result.source.index !== result.destination.index
+    ) {
+      onUpdateMobs(draggedMobs);
+    }
+  }, [onUpdateMobs, draggedMobs]);
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
       <Droppable droppableId="mobs">
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
