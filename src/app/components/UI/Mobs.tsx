@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
@@ -84,7 +84,11 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
                       <div {...provided.dragHandleProps}>
                         <VscThreeBars size={30}/>
                       </div>
-                      <MobName name={mob.name} key={mob.id} type={mob.type}/>
+                      <MobName 
+                        name={mob.name} 
+                        key={mob.id} 
+                        index={i}
+                        type={mob.type}/>
                     </MobNameWrapper>
                   )}
                 </Draggable>

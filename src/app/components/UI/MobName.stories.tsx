@@ -10,9 +10,9 @@ export default {
 } as Meta;
 
 export const named: Story = () => (
-  <MobName name="Test" />
+  <MobName name="Test" index={1}/>
 );
 
 export const Empty: Story = () => (
-  <MobName type="Navigator" />
+  <MobName type="Navigator" index={1} />
 );

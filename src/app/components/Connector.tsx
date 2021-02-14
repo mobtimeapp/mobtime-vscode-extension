@@ -1,8 +1,11 @@
 import React, { ChangeEventHandler, useCallback, useState } from 'react';
 import { useStore } from '../StoreProvider';
 import { parseMobTimeName } from '../utils/timerNameParser';
-import { Button } from './UI/Button';
+import { Button as ButtonUI } from './UI/Button';
 import { VscDebugDisconnect } from 'react-icons/vsc';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const Button = motion.custom(ButtonUI);
 
 export const Connector: React.FC = () => {
   const { dispatch } = useStore();
@@ -25,15 +28,32 @@ export const Connector: React.FC = () => {
         placeholder="Enter MobTime Name / url"
         onChange={handleInputBlur}
       />
-      {timerName && (
-        <Button
-          disabled={!timerName}
-          onClick={handleConnection}
-        >
-          <VscDebugDisconnect size={20}/> 
-          <p>Connect - {timerName}</p>
-        </Button>
-      )}
+      <AnimatePresence>
+        {timerName && (
+          <Button
+            onClick={handleConnection}
+            initial={{
+              y: 50,
+              opacity: 0
+            }}
+            animate={{
+              y: 0,
+              opacity: 1
+            }}
+            exit={{
+              y: 50,
+              opacity: 0
+            }}
+            transition={{
+              type: 'spring',
+              duration: 0.4
+            }}
+          >
+            <VscDebugDisconnect size={20}/> 
+            <p>Connect - {timerName}</p>
+          </Button>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 interface MobNameProps {
   type?: string;
   name?: string;
+  index: number;
 }
 
-export const MobName: React.FC<MobNameProps> = ({ type, name }) => (
+export const MobName: React.FC<MobNameProps> = ({ type, name, index }) => (
   <div>
     <motion.h3
       key={type}
@@ -23,9 +24,9 @@ export const MobName: React.FC<MobNameProps> = ({ type, name }) => (
       </strong>
     </motion.h3>
     <motion.h1
-      key={name+type}
-      initial={{ rotateX: -90, opacity: 0.5 }}
-      animate={{ rotateX: 0, opacity: 1 }}
+      key={`${name || index}`}
+      initial={{ rotateX: -90, opacity: 0.4 }}
+      animate={{ rotateX: 0, opacity: name ? 1 : 0.5 }}
       style={{ 
         marginBottom: '20px',
         opacity: name ? 1 : 0.5,

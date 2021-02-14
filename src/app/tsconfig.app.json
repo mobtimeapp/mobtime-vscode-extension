@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "strict": true,
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es6",
@@ -18,6 +17,7 @@
   "include": ["**/*.tsx","**/*.ts"],
   "exclude": [
     "node_modules",
-    "**/*.spec.tsx"
+    "**/*.spec.tsx",
+    "**/*.stories.tsx"
   ]
 }

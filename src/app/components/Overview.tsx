@@ -5,6 +5,7 @@ import { FiUsers } from 'react-icons/fi';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsCardChecklist } from 'react-icons/bs';
 import { Goal } from './Goal';
+import { MobName } from './UI/MobName';
 
 export const Overview: React.FC = () => {
   const { state: { settings, mob, goals } } = useStore();
@@ -30,20 +31,12 @@ export const Overview: React.FC = () => {
         </Link>
       </TitleContainer>
       {mobOders.map((order, orderIndex) => (
-        <React.Fragment key={order}>
-          <h3>
-            <strong>
-              {order}
-            </strong>
-          </h3>
-          <h1 style={{ 
-            marginBottom: '20px',
-            opacity: (mob && mob[orderIndex]?.name)  ? 1 : 0.5,
-            fontWeight: 700
-          }}>
-            {(mob && mob[orderIndex]?.name) || 'Empty' }
-          </h1>
-        </React.Fragment>
+        <MobName 
+          name={mob[orderIndex]?.name}
+          key={orderIndex}
+          type={order}
+          index={orderIndex}
+        />
       ))}
       <TitleContainer>
         <h3>
