@@ -48,12 +48,10 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
       result.source
       && result.destination
     ) {
-      const newMobs = [...mobs];
-      const source = {...mobs[result.source.index]};
-      const destination ={...mobs[result.destination.index]};
-      newMobs[result.source.index] = destination;
-      newMobs[result.destination.index] = source;
-      setDraggedMobs(newMobs);
+      const items = Array.from(mobs);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+      setDraggedMobs(items);
     }
   };
 
