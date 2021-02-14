@@ -14,7 +14,6 @@ export const MobName: React.FC<MobNameProps> = memo(({ type, name, index }) => (
       initial={{ marginLeft: '-10%', opacity: 0 }}
       animate={{ marginLeft: '0%', opacity: 1 }}
       transition={{ duration: 0.3 }}
-      data-type={type}
       style={{
         overflow: 'hidden',
       }}

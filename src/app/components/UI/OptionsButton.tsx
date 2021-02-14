@@ -42,6 +42,7 @@ export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) =>
               width: 30,
               padding: `6px 4px`,
               marginRight: '5px',
+              pointerEvents: 'all'
             },
             close: {
               width: 0,

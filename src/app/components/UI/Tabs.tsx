@@ -101,12 +101,11 @@ export const Tabs: React.FC<TabsProps> = memo(({
         ))}
       </TabsWrapper>
       <Highlighter
-        initial={{
-          width: '0%',
-          marginLeft: `${((100/tabs.length) * previousActiveIndex.current) + 100/(tabs.length * 2)}%`
+        initial={false}
+        style={{
+          width: `${100/tabs.length}%`
         }}
         animate={{
-          width: ['5%', `${100/tabs.length}%`],
           marginLeft: `${((100/tabs.length) * activeIndex) + 100/(tabs.length * 2)}%`
         }}
         transition={{
