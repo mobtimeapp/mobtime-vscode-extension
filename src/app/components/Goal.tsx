@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react';
 import { useStore } from '../StoreProvider';
 import styled from '@emotion/styled';
-import { FiCheckCircle, FiCircle } from 'react-icons/fi';
 import { GoalType } from '../shared/eventTypes';
+import { Checkbox } from './UI/Checkbox';
+import { animate, motion } from 'framer-motion';
+import { Checkout } from './UI/Checkout';
 
 interface GoalProps extends Partial<GoalType> {
   placeholder: string
@@ -12,15 +14,11 @@ const GoalWrapper = styled.div`
   display: flex;
   align-items: start;
   svg {
-    cursor: pointer;
     margin-top: 2px;
     min-width: 20px;
     min-height: 20px;
     margin-right: 10px;
     margin-bottom: 10px;
-    polyline {
-      stroke: var(--vscode-terminal-ansiBrightGreen);
-    }
   }
 `;
 
@@ -46,19 +44,37 @@ export const Goal: React.FC<GoalProps> = ({
   }, [id, completed]);
 
   return (
+    <GoalUI
+      text={text}
+      placeholder={placeholder}
+      onClick={handleCheck}
+      completed={completed}
+    />
+  );
+};
+
+export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
+  placeholder,
+  completed,
+  text,
+  onClick
+}) => {
+
+  return (
     <GoalWrapper>
-      {completed ? 
-        <FiCheckCircle onClick={handleCheck}/> : 
-        <FiCircle onClick={handleCheck}/>
-      }
-      <h2
+      <Checkbox checked={completed} onChange={onClick} />
+      <motion.h2
         style={{
-          textDecoration: completed ? 'line-through' : 'none',
-          opacity: text ? 1 : 0.5
+          opacity: text ? 1 : 0.5,
+          position: 'relative',
+          overflow: 'hidden'
         }}
+        initial={false}
+        animate={completed ? 'checked' : 'noChecked'}
       >
-        {text || placeholder}
-      </h2>
+        {(text || placeholder)}
+        <Checkout />
+      </motion.h2>
     </GoalWrapper>
   );
 };
