@@ -2,11 +2,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
-import { VscChevronDown, VscChevronUp, VscEdit, VscMenu, VscTrash } from "react-icons/vsc";
+import { VscChevronDown, VscChevronUp, VscEdit, VscMenu, VscRefresh, VscTrash } from "react-icons/vsc";
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { NewMob } from './NewMob';
 import { OptionsButton } from './OptionsButton';
+import { shuffleArray } from '../../utils/arraySort';
+
+import { Button } from './Button';
+import { RandomIcon } from '../Icons/RandomIcon';
 
 interface MobsProps {
   mobs: Store['mob'];
@@ -31,6 +35,29 @@ const MobNameWrapper = styled.div`
     * {
       stroke: var(--vscode-foreground)
     }
+  }
+`;
+
+const MotionButton = styled(motion.custom(Button))`
+  p {
+    margin-left: 8px;
+  }
+  div {
+    width: 20px;
+    height: 20px;
+  }
+  svg {
+    margin-right: 0px;
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const ActionsButtons = styled.div`
+  display: flex;
+  padding-left: 5px;
+  button {
+    margin-right: 5px;
   }
 `;
 
@@ -88,6 +115,22 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
       const newMob = mobs.filter(({ id }) => id !== mobId);
       onUpdateMobs(newMob);
       return newMob;
+    });
+  }, [onUpdateMobs]);
+
+  const handleRotate = useCallback(() => {
+    setDraggedMobs(([firstMob, ...otherMobs]) => {
+      const newMobs = [...otherMobs, firstMob];
+      onUpdateMobs(newMobs);
+      return newMobs;
+    });
+  }, [onUpdateMobs]);
+
+  const handleSuffle = useCallback(() => {
+    setDraggedMobs((mobs) => {
+      const newMobs = shuffleArray(mobs);
+      onUpdateMobs(newMobs);
+      return newMobs;
     });
   }, [onUpdateMobs]);
 
@@ -155,6 +198,51 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
           )}
         </Droppable>
       </DragDropContext>
+      <ActionsButtons>
+        <MotionButton
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          whileTap="tapped"
+          onClick={handleRotate}
+        >
+          <motion.div 
+            variants={{
+              rest: {
+                rotateZ: 0,
+              },
+              hover: {
+                rotateZ: 180,
+              },
+              tapped: {
+                rotateZ: 360,
+              }
+            }}
+            transition={{
+              type: 'spring',
+              duration: 0.5
+            }}
+          >
+            <VscRefresh />
+          </motion.div>
+          <p>
+            Rotate
+          </p>
+        </MotionButton>
+        <MotionButton
+          className="secondary"
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          whileTap="tapped"
+          onClick={handleSuffle}
+        >
+          <RandomIcon />
+          <p>
+            Random
+          </p>
+        </MotionButton>
+      </ActionsButtons>
       <NewMob onMobAdd={handleNewMob} />
     </div>
   );

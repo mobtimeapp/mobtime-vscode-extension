@@ -72,4 +72,4 @@ export const Tabs: Story = (props) =>{
     </TabsUI>
   </div>
 );
-}
+};
