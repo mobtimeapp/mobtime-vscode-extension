@@ -1,8 +1,8 @@
 import React, { memo, useMemo } from 'react';
 import { motion, useCycle } from 'framer-motion';
 import { IconType } from 'react-icons';
-import { VscKebabVertical, VscClose } from 'react-icons/vsc';
 import styled from '@emotion/styled';
+import { OptionIcon } from '../Icons/OptionIcon';
 
 interface OptionsButtonProps {
   options: {
@@ -20,7 +20,8 @@ const IconButton = styled.button`
   align-items: center;
   display: flex;
   svg: {
-    /* width: 25px; */
+    width: 25px;
+    height: 25px;
     margin-right: 0 !important;
   }
 `;
@@ -64,19 +65,14 @@ export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) =>
           <option.icon size="25px" color={option.color} />
         </Button>
       ))}
-      <IconButton 
+      <Button 
         style={{ width: '30px', zIndex: 3 }}
         onClick={() => toggleOpen()}
+        initial="close"
+        animate={open}
       >
-        {open === 'open' ? 
-          <VscClose 
-            size="25px"
-          /> : 
-          <VscKebabVertical 
-            size="16px" 
-          />
-        }
-      </IconButton>
+        <OptionIcon />
+      </Button>
     </div>
   );
 });
