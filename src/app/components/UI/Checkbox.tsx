@@ -8,7 +8,7 @@ export interface CheckboxProps {
 } 
 
 export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
-  const varient = useMemo(() => checked ? 'checked' : 'notChecked', [checked]);
+  const varient = useMemo(() => checked ? 'ck' : 'notCk', [checked]);
   
   return (
     <div 
@@ -30,10 +30,10 @@ export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
           strokeWidth={2}
           fill="none"
           variants={{
-            checked: {
+            ck: {
               strokeDasharray: 40
             },
-            notChecked: {
+            notCk: {
               strokeDasharray: 50
             }
           }}
@@ -45,7 +45,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
           strokeWidth={2}
           fill="none"
           variants={{
-            checked: {
+            ck: {
               d: [
                 "M 5,10 5,10 5,10",
                 "M 5,10 9,13 9,13",
@@ -57,7 +57,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
                 1,
               ],
             },
-            notChecked: {
+            notCk: {
               d: [
                 "M 5,10 9,13 18,2",
                 "M 5,10 9,13 9,13",

@@ -4,6 +4,7 @@ import { BsCardChecklist } from 'react-icons/bs';
 import { FiUsers } from 'react-icons/fi';
 import { VscEye, VscTools } from 'react-icons/vsc';
 import { Connector } from './components/Connector';
+import { Goals } from './components/Goals';
 import { Overview } from './components/Overview';
 import { Timer } from './components/Timer';
 import { Button } from './components/UI/Button';
@@ -80,6 +81,7 @@ export const App: React.FC = () => {
             onUpdateMobs={handleMobUpdate}
             order={settings?.mobOrder || ''}
           />
+          <Goals />
         </Tabs>
       </div>
       <Button
