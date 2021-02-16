@@ -6,7 +6,7 @@ import { Sortables } from './UI/Sortables';
 
 const placeholders = [
   'A good day would be...',
-  'A grate day would be ...'
+  'A great day would be ...'
 ];
 
 export const mapGoals = (goals: GoalType[]): (GoalType & { placholder?: string, hideOption?: boolean })[] => (
@@ -33,10 +33,11 @@ export const Goals: React.FC = () => {
       })}
       children={(goal) => (
         <Goal 
-          placeholder={goal.placholder}
-          completed={goal.completed}
-          id={goal.id}
-          text={goal.text}
+          placeholder={goal?.placholder}
+          completed={goal?.completed}
+          id={goal?.id}
+          text={goal?.text}
+          key={goal?.id}
         />
       )}
     />

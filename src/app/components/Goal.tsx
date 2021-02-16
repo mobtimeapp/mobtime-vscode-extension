@@ -10,7 +10,7 @@ interface GoalProps extends Partial<GoalType> {
   placeholder: string
 }
 
-const GoalWrapper = styled(motion.div)`
+const GoalWrapper = styled.div`
   display: flex;
   align-items: start;
   span {
@@ -72,8 +72,6 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
 
   return (
     <GoalWrapper
-      initial={false}
-      animate={completed ? 'checked' : 'noChecked'}
       style={{
         pointerEvents: text ? 'auto' : 'none'
       }}
@@ -105,6 +103,7 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
           }
         }}
         initial={false}
+        animate={completed ? 'checked' : 'noChecked'}
       >
         {(text || placeholder)}
       </motion.h2>

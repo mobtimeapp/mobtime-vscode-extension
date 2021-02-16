@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 
@@ -7,12 +7,13 @@ export interface CheckboxProps {
   onChange?: (checked: boolean) => void;
 } 
 
-export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
+export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) => {
   const varient = useMemo(() => checked ? 'ck' : 'notCk', [checked]);
+  const onClick = useCallback(() => onChange && onChange(!checked), [checked]);
   
   return (
     <div 
-      onClick={() => onChange && onChange(!checked)}
+      onClick={onClick}
     >
       <svg 
         width={25}
@@ -83,4 +84,4 @@ export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
       </svg>
     </div>
   );
-};
+});

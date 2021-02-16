@@ -6,6 +6,7 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { BsCardChecklist } from 'react-icons/bs';
 import { Goal } from './Goal';
 import { MobName } from './UI/MobName';
+import { mapGoals } from './Goals';
 
 export const Overview: React.FC = () => {
   const { state: { settings, mob, goals } } = useStore();
@@ -54,18 +55,15 @@ export const Overview: React.FC = () => {
           Edit Goals
         </Link>
       </TitleContainer>
-      <Goal 
-        placeholder="A good day would be..."
-        text={goals[0]?.text}
-        id={goals[0]?.id}
-        completed={goals[0]?.completed}
-      />
-      <Goal 
-        placeholder="A grate day would be..."
-        text={goals[1]?.text}
-        id={goals[1]?.id}
-        completed={goals[1]?.completed}
-      />
+      {mapGoals(goals).map(goal => (
+        <Goal 
+          placeholder={goal.placholder}
+          text={goal?.text}
+          id={goal?.id}
+          completed={goal?.completed}
+          key={goal?.id}
+        />
+      ))}
     </div>
   );
 };
