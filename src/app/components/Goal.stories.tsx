@@ -12,11 +12,13 @@ export default {
 export const Goal: Story = () => {
   const [check, setCheck] = useState(true);
   return (
-    <GoalUI
-      onClick={() => setCheck(c => !c)}
-      text="Some goal can be typed here, it can complete too."
-      completed={check}
-      placeholder=""
-    />
+    <>
+      <GoalUI
+        onClick={() => setCheck(c => !c)}
+        text="Some goal can be typed here, it can complete too."
+        completed={check}
+        placeholder=""
+      />
+    </>
   );
 };

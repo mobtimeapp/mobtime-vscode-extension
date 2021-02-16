@@ -98,6 +98,7 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^17.0.1",
     "react-icons": "^4.2.0",
+    "react-rewards": "^1.1.2",
     "ws": "^7.4.3"
   },
   "optionalDependencies": {

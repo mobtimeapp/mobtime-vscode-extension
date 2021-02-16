@@ -56,11 +56,15 @@ export const Overview: React.FC = () => {
       </TitleContainer>
       <Goal 
         placeholder="A good day would be..."
-        {...(goals ? goals[0] : {})}
+        text={goals[0]?.text}
+        id={goals[0]?.id}
+        completed={goals[0]?.completed}
       />
       <Goal 
         placeholder="A grate day would be..."
-        {...(goals ? goals[1] : {})}
+        text={goals[1]?.text}
+        id={goals[1]?.id}
+        completed={goals[1]?.completed}
       />
     </div>
   );

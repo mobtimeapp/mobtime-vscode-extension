@@ -1,18 +1,22 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useStore } from '../StoreProvider';
 import styled from '@emotion/styled';
 import { GoalType } from '../shared/eventTypes';
 import { Checkbox } from './UI/Checkbox';
-import { animate, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Checkout } from './UI/Checkout';
+import Reward, { RewardElement } from 'react-rewards';
 
 interface GoalProps extends Partial<GoalType> {
   placeholder: string
 }
 
-const GoalWrapper = styled.div`
+const GoalWrapper = styled(motion.div)`
   display: flex;
   align-items: start;
+  span {
+    position: fixed
+  }
   svg {
     margin-top: 2px;
     min-width: 20px;
@@ -59,10 +63,33 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
   text,
   onClick
 }) => {
+  const rewardRef = useRef<RewardElement>(null);
+  const onChange = (completed: boolean) => {
+    if (completed) {
+      rewardRef.current?.rewardMe();
+    }
+    onClick();
+  };
 
   return (
-    <GoalWrapper>
-      <Checkbox checked={completed} onChange={onClick} />
+    <GoalWrapper
+      initial={false}
+      animate={completed ? 'checked' : 'noChecked'}
+    >
+      <Reward
+        ref={(ref) => rewardRef.current = ref}
+        type="confetti"
+        config={{
+          lifetime: 80,
+          elementCount: 50,
+          spread: 150,
+          decay: 0.8,
+          angle: 45,
+          zIndex: 100,
+        }}
+      >
+        <Checkbox checked={completed} onChange={onChange} />
+      </Reward>
       <motion.h2
         style={{
           opacity: text ? 1 : 0.5,
@@ -70,7 +97,6 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
           overflow: 'hidden'
         }}
         initial={false}
-        animate={completed ? 'checked' : 'noChecked'}
       >
         {(text || placeholder)}
         <Checkout />
