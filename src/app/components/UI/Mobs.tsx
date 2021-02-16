@@ -135,7 +135,7 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
   }, [onUpdateMobs]);
 
   return (
-    <div>
+    <div style={{ marginTop: '10px' }}>
       <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
         <Droppable droppableId="mobs">
           {(provided) => (
@@ -246,4 +246,4 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
       <NewMob onMobAdd={handleNewMob} />
     </div>
   );
-}
+};

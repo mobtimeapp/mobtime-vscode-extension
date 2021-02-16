@@ -1,10 +1,9 @@
-import React, { useCallback, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { useStore } from '../StoreProvider';
 import styled from '@emotion/styled';
 import { GoalType } from '../shared/eventTypes';
 import { Checkbox } from './UI/Checkbox';
 import { motion } from 'framer-motion';
-import { Checkout } from './UI/Checkout';
 import Reward, { RewardElement } from 'react-rewards';
 
 interface GoalProps extends Partial<GoalType> {
@@ -15,7 +14,7 @@ const GoalWrapper = styled(motion.div)`
   display: flex;
   align-items: start;
   span {
-    position: fixed
+    position: fixed !important;
   }
   svg {
     margin-top: 2px;
@@ -57,7 +56,7 @@ export const Goal: React.FC<GoalProps> = ({
   );
 };
 
-export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
+export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
   placeholder,
   completed,
   text,
@@ -75,16 +74,18 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
     <GoalWrapper
       initial={false}
       animate={completed ? 'checked' : 'noChecked'}
+      style={{
+        pointerEvents: text ? 'auto' : 'none'
+      }}
     >
       <Reward
         ref={(ref) => rewardRef.current = ref}
         type="confetti"
         config={{
-          lifetime: 80,
-          elementCount: 50,
-          spread: 150,
-          decay: 0.8,
-          angle: 45,
+          elementCount: 200,
+          spread: 200,
+          decay: 0.9,
+          angle: 65,
           zIndex: 100,
         }}
       >
@@ -93,14 +94,20 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = ({
       <motion.h2
         style={{
           opacity: text ? 1 : 0.5,
-          position: 'relative',
-          overflow: 'hidden'
+          textDecorationThickness: 3
+        }}
+        variants={{
+          checked: {
+            textDecorationLine: 'line-through'
+          },
+          noChecked: {
+            textDecorationLine: 'none'
+          }
         }}
         initial={false}
       >
         {(text || placeholder)}
-        <Checkout />
       </motion.h2>
     </GoalWrapper>
   );
-};
+});

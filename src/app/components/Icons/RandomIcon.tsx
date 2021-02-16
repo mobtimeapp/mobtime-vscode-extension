@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { randomInteger } from '../../utils/randomNumber';
 
 const restSort = [0, 1, 2, 3];
@@ -7,6 +7,7 @@ const hoverSort = [2, 1, 3, 0];
 const tapSort = [3, 0, 1, 2];
 
 export const RandomIcon: React.FC = () => {
+  const lineLength = useMemo(() => [...Array(4)].map(() => randomInteger(12, 20)), []);
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
@@ -35,7 +36,7 @@ export const RandomIcon: React.FC = () => {
           />
           <motion.line
             x1={6.5}
-            x2={randomInteger(12, 20)}
+            x2={lineLength[i]}
             variants={{
               rest: {
                 y1: (5 * restSort[i]) + 2.5,
