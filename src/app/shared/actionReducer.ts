@@ -1,12 +1,14 @@
 import { Reducer } from "react";
 import { Actions, Store } from "./eventTypes";
 
-const defaultState = {
+const defaultState: Store = {
   activeTabIndex: 0,
   settings: {
     duration: 5000,
     mobOrder: 'Navigator,Driver'
   },
+  goals: [],
+  mob: [],
 };
 
 export const reducerApp: Reducer<Store, Actions> = (currentState, action) => {

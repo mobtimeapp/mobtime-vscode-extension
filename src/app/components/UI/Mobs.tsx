@@ -18,41 +18,6 @@ interface MobsProps {
   order: string;
 }
 
-const MobNameWrapper = styled.div`
-  display: flex;
-  width: '100%';
-  align-items: center;
-  h1 {
-    margin-bottom: 0px !important;
-  }
-  margin-bottom: 24px;
-  .dragIcon {
-    margin-right: 10px;
-    opacity: 0.5;
-    :hover {
-      opacity: 1;
-    }
-    * {
-      stroke: var(--vscode-foreground)
-    }
-  }
-`;
-
-const MotionButton = styled(motion.custom(Button))`
-  p {
-    margin-left: 8px;
-  }
-  div {
-    width: 20px;
-    height: 20px;
-  }
-  svg {
-    margin-right: 0px;
-    width: 20px;
-    height: 20px;
-  }
-`;
-
 const ActionsButtons = styled.div`
   display: flex;
   padding-left: 5px;
@@ -247,3 +212,38 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
     </div>
   );
 };
+
+const MobNameWrapper = styled.div`
+  display: flex;
+  width: '100%';
+  align-items: center;
+  h1 {
+    margin-bottom: 0px !important;
+  }
+  margin-bottom: 24px;
+  .dragIcon {
+    margin-right: 10px;
+    opacity: 0.5;
+    :hover {
+      opacity: 1;
+    }
+    * {
+      stroke: var(--vscode-foreground)
+    }
+  }
+`;
+
+const MotionButton = styled(motion.custom(Button))`
+  p {
+    margin-left: 8px;
+  }
+  div {
+    width: 20px;
+    height: 20px;
+  }
+  svg {
+    margin-right: 0px;
+    width: 20px;
+    height: 20px;
+  }
+`;

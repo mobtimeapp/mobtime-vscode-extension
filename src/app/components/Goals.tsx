@@ -20,17 +20,15 @@ export const mapGoals = (goals: GoalType[] = []): (GoalType & { placholder?: str
 
 export const Goals: React.FC = () => {
   const { state: { goals }, dispatch } = useStore();
-  const mappedGoals = useMemo(() => mapGoals(goals || []), [goals]);
   return (
     <Sortables
-      items={mappedGoals}
+      items={goals || []}
       disableDrag={goals?.length < 2}
       onItemsUpdate={items => dispatch({
         type: 'goals:update',
         goals: items
-          .filter(g => g.text)
-          .map(({ placholder, hideOption, ...goal }) => goal)
       })}
+      mapItems={mapGoals}
       children={(goal) => (
         <Goal 
           placeholder={goal?.placholder}

@@ -5,36 +5,15 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { OptionsButton } from './OptionsButton';
 
-
-interface SortablesProps<A extends unknown> {
+type SortablesComponent = <A extends { id: string }, MI extends A & { hideOption?: boolean }>(props: {
   items: A[];
   disableDrag?: boolean;
   onItemsUpdate?: (newMobs: A[]) => void;
-  children: (item: A) => React.ReactChild
-}
+  mapItems: (items: A[]) => MI[];
+  children: (item: MI) => React.ReactChild;
+}) => ReturnType<React.FC>;
 
-const MobNameWrapper = styled.div`
-  display: flex;
-  width: '100%';
-  align-items: flex-start;
-  position: relative;
-  h1 {
-    margin-bottom: 0px !important;
-  }
-  margin-bottom: 24px;
-  .dragIcon {
-    margin-right: 10px;
-    opacity: 0.5;
-    :hover {
-      opacity: 1;
-    }
-    * {
-      stroke: var(--vscode-foreground)
-    }
-  }
-`;
-
-export const Sortables = <A extends { id: string, hideOption?: boolean }>({ items, onItemsUpdate, children, disableDrag }: SortablesProps<A>) => {
+export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, disableDrag, mapItems }) => {
   const [draggedItems, setDraggedItems] = useState(items);
   useEffect(() => {
     setDraggedItems(items);
@@ -75,7 +54,9 @@ export const Sortables = <A extends { id: string, hideOption?: boolean }>({ item
       <Droppable droppableId="items">
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
-            {draggedItems.map((item, i) => (
+            {
+              mapItems(draggedItems)
+              .map((item, i) => (
               <Draggable key={item.id} draggableId={item.id.toString()} index={i}>
                 {(provided) => (
                   <MobNameWrapper 
@@ -144,3 +125,24 @@ export const Sortables = <A extends { id: string, hideOption?: boolean }>({ item
     </DragDropContext>
   );
 };
+
+const MobNameWrapper = styled.div`
+  display: flex;
+  width: '100%';
+  align-items: flex-start;
+  position: relative;
+  h1 {
+    margin-bottom: 0px !important;
+  }
+  margin-bottom: 24px;
+  .dragIcon {
+    margin-right: 10px;
+    opacity: 0.5;
+    :hover {
+      opacity: 1;
+    }
+    * {
+      stroke: var(--vscode-foreground)
+    }
+  }
+`;
