@@ -1,168 +1,69 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Store } from '../../shared/eventTypes';
 import { MobName } from './MobName';
-import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
-import { VscChevronDown, VscChevronUp, VscEdit, VscMenu, VscRefresh, VscTrash } from "react-icons/vsc";
+import { VscRefresh } from "react-icons/vsc";
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { NewMob } from './NewMob';
-import { OptionsButton } from './OptionsButton';
 import { shuffleArray } from '../../utils/arraySort';
 
 import { Button } from './Button';
 import { RandomIcon } from '../Icons/RandomIcon';
+import { useStore } from '../../StoreProvider';
+import { Sortables } from './Sortables';
 
-interface MobsProps {
-  mobs: Store['mob'];
-  onUpdateMobs?: (newMobs: Store['mob']) => void;
-  order: string;
-}
+export const Mobs: React.FC = () => {
+  const { state: { mob, settings }, dispatch } = useStore();
+  const handleMobsUpdate = useCallback((mob: Store['mob']) => {
+    dispatch({
+      type: 'mob:update',
+      mob
+    });
+  }, [dispatch]);
 
-const ActionsButtons = styled.div`
-  display: flex;
-  padding-left: 5px;
-  button {
-    margin-right: 5px;
-  }
-`;
-
-export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
-  const [draggedMobs, setDraggedMobs] = useState(mobs);
-  useEffect(() => {
-    setDraggedMobs(mobs);
-  }, [mobs]);
-
-  const mappedMobs = useMemo(() => {
-    const orders = order.split(',');
-    return [...Array(Math.max(orders.length, draggedMobs?.length || 0))].map((_, i) => ({
-      id: (draggedMobs[i]?.id || i).toString(),
-      name: draggedMobs[i]?.name,
+  const mapMobs = useCallback((mobs: Store['mob'] = []) => {
+    const orders = settings?.mobOrder?.split(',') || [];
+    return [...Array(Math.max(orders.length || 0, mobs?.length || 0))].map((_, i) => ({
+      id: (mobs[i]?.id || i).toString(),
+      name: mobs[i]?.name,
       type: orders[i]
     }));
   }
-  ,[order, draggedMobs]);
+  ,[settings?.mobOrder]);
 
-  const handleDragUpdate = (result: DragUpdate) => {
-    if (
-      result.source
-      && result.destination
-    ) {
-      const items = Array.from(mobs);
-      const [reorderedItem] = items.splice(result.source.index, 1);
-      items.splice(result.destination.index, 0, reorderedItem);
-      setDraggedMobs(items);
-    }
-  };
-
-  const handleDrag = useCallback((result: DropResult) => {
-    if (
-      result.source
-      && result.destination
-      && result.source.index !== result.destination.index
-    ) {
-      onUpdateMobs(draggedMobs);
-    }
-  }, [onUpdateMobs, draggedMobs]);
-
-  const handleNewMob = useCallback((mob: Store['mob'][number]) => {
-    setDraggedMobs(mobs => {
-      const newMob = [
-        ...mobs,
-        mob
-      ];
-      onUpdateMobs(newMob);
-      return newMob;
-    });
-  }, [onUpdateMobs]);
-
-  const handleDelete = useCallback((mobId: string) => {
-    setDraggedMobs(mobs => {
-      const newMob = mobs.filter(({ id }) => id !== mobId);
-      onUpdateMobs(newMob);
-      return newMob;
-    });
-  }, [onUpdateMobs]);
 
   const handleRotate = useCallback(() => {
-    setDraggedMobs(([firstMob, ...otherMobs]) => {
-      const newMobs = [...otherMobs, firstMob];
-      onUpdateMobs(newMobs);
-      return newMobs;
-    });
-  }, [onUpdateMobs]);
+    const [firstMob, ...otherMobs] = mob;
+    handleMobsUpdate([...otherMobs, firstMob]);
+  }, [mob, handleMobsUpdate]);
 
   const handleSuffle = useCallback(() => {
-    setDraggedMobs((mobs) => {
-      const newMobs = shuffleArray(mobs);
-      onUpdateMobs(newMobs);
-      return newMobs;
-    });
-  }, [onUpdateMobs]);
+    handleMobsUpdate(shuffleArray(mob));
+  }, [handleMobsUpdate, mob]);
+
+  const handleNewMob = useCallback((newMob: Store['mob'][number]) => {
+    handleMobsUpdate([
+      ...mob,
+      newMob
+    ]);
+  }, [handleMobsUpdate, mob]);
 
   return (
     <div style={{ marginTop: '10px' }}>
-      <DragDropContext onDragEnd={handleDrag} onDragUpdate={handleDragUpdate}>
-        <Droppable droppableId="mobs">
-          {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {mappedMobs.map((mob, i) => (
-                <Draggable key={mob.id} draggableId={mob.id.toString()} index={i}>
-                  {(provided) => (
-                    <MobNameWrapper 
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                    >
-                      <motion.div
-                        initial={{ scaleX: 0.75 }}
-                        whileTap={{ scaleY: 0.5 }}
-                      >
-                        <div {...provided.dragHandleProps}>
-                          <VscMenu
-                            className="dragIcon"
-                            size={30}
-                          />
-                        </div>
-                      </motion.div>
-                      <MobName 
-                        name={mob.name} 
-                        key={mob.id} 
-                        index={i}
-                        type={mob.type}
-                      />
-                      {mob.name && (
-                        <OptionsButton
-                          options={[
-                            {
-                              icon: VscChevronUp,
-                              onClick: () => {},
-                              hidden: i === 0
-                            },
-                            {
-                              icon: VscChevronDown,
-                              onClick: () => {},
-                              hidden: (i + 1) === mappedMobs.length
-                            },
-                            {
-                              icon: VscEdit,
-                              onClick: () => {},
-                            },
-                            {
-                              icon: VscTrash,
-                              onClick: () => handleDelete(mob.id),
-                              color: 'var(--vscode-charts-red)'
-                            },
-                          ]}
-                        />
-                      )}
-                    </MobNameWrapper>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Sortables
+        items={mob || []}
+        disableDrag={(mob || [])?.length < 2}
+        onItemsUpdate={handleMobsUpdate}
+        mapItems={mapMobs}
+        children={(mob, i) => (
+          <MobName 
+            name={mob.name} 
+            key={mob.id} 
+            index={i}
+            type={mob.type}
+          />
+        )}
+      />
       <ActionsButtons>
         <MotionButton
           initial="rest"
@@ -213,25 +114,14 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
   );
 };
 
-const MobNameWrapper = styled.div`
+const ActionsButtons = styled.div`
   display: flex;
-  width: '100%';
-  align-items: center;
-  h1 {
-    margin-bottom: 0px !important;
-  }
-  margin-bottom: 24px;
-  .dragIcon {
-    margin-right: 10px;
-    opacity: 0.5;
-    :hover {
-      opacity: 1;
-    }
-    * {
-      stroke: var(--vscode-foreground)
-    }
+  padding-left: 5px;
+  button {
+    margin-right: 5px;
   }
 `;
+
 
 const MotionButton = styled(motion.custom(Button))`
   p {

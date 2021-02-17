@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GoalType } from '../shared/eventTypes';
 import { useStore } from '../StoreProvider';
 import { Goal } from './Goal';
@@ -20,14 +20,19 @@ export const mapGoals = (goals: GoalType[] = []): (GoalType & { placholder?: str
 
 export const Goals: React.FC = () => {
   const { state: { goals }, dispatch } = useStore();
+
+  const handleGoalsUpdate = useCallback((goals: GoalType[]) => {
+    dispatch({
+      type: 'goals:update',
+      goals: goals
+    });
+  }, []);
+
   return (
     <Sortables
       items={goals || []}
       disableDrag={goals?.length < 2}
-      onItemsUpdate={items => dispatch({
-        type: 'goals:update',
-        goals: items
-      })}
+      onItemsUpdate={handleGoalsUpdate}
       mapItems={mapGoals}
       children={(goal) => (
         <Goal 

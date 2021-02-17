@@ -12,7 +12,7 @@ export const MobName: React.FC<MobNameProps> = memo(({ type, name, index }) => (
     <motion.h3
       key={type}
       initial={{ marginLeft: '-10%', opacity: 0 }}
-      animate={{ marginLeft: '0%', opacity: 1 }}
+      animate={{ marginLeft: '0%', opacity: 0.7 }}
       transition={{ duration: 0.3 }}
       style={{
         overflow: 'hidden',

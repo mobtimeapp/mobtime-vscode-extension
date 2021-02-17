@@ -10,7 +10,7 @@ type SortablesComponent = <A extends { id: string }, MI extends A & { hideOption
   disableDrag?: boolean;
   onItemsUpdate?: (newMobs: A[]) => void;
   mapItems: (items: A[]) => MI[];
-  children: (item: MI) => React.ReactChild;
+  children: (item: MI, index: number) => React.ReactChild;
 }) => ReturnType<React.FC>;
 
 export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, disableDrag, mapItems }) => {
@@ -78,7 +78,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                       </div>
                     </motion.div>
                     <div style={{ width: '100%', marginRight: '35px' }}>
-                      {children(item)}
+                      {children(item, i)}
                     </div>
                     {!item.hideOption && (
                       <div
