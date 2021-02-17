@@ -1,16 +1,16 @@
 import React, { useCallback } from 'react';
-import { Store } from '../../shared/eventTypes';
-import { MobName } from './MobName';
 import { VscRefresh } from "react-icons/vsc";
 import styled from '@emotion/styled';
+import { AiOutlineUserAdd } from 'react-icons/ai';
+import { Store } from '../shared/eventTypes';
 import { motion } from 'framer-motion';
-import { NewMob } from './NewMob';
-import { shuffleArray } from '../../utils/arraySort';
-
-import { Button } from './Button';
-import { RandomIcon } from '../Icons/RandomIcon';
-import { useStore } from '../../StoreProvider';
-import { Sortables } from './Sortables';
+import { shuffleArray } from '../utils/arraySort';
+import { RandomIcon } from './Icons/RandomIcon';
+import { useStore } from '../StoreProvider';
+import { Sortables } from './UI/Sortables';
+import { MobName } from './UI/MobName';
+import { NewItem } from './UI/NewItem';
+import { Button } from './UI/Button';
 
 export const Mobs: React.FC = () => {
   const { state: { mob, settings }, dispatch } = useStore();
@@ -42,10 +42,16 @@ export const Mobs: React.FC = () => {
     handleMobsUpdate(shuffleArray(mob));
   }, [handleMobsUpdate, mob]);
 
-  const handleNewMob = useCallback((newMob: Store['mob'][number]) => {
+  const handleNewMob = useCallback((newItem: {
+    id: string,
+    text: string
+  }) => {
     handleMobsUpdate([
       ...mob,
-      newMob
+      {
+        id: newItem.id,
+        name: newItem.text
+      }
     ]);
   }, [handleMobsUpdate, mob]);
 
@@ -115,7 +121,11 @@ export const Mobs: React.FC = () => {
           </p>
         </MotionButton>
       </ActionsButtons>
-      <NewMob onMobAdd={handleNewMob} />
+      <NewItem
+        onItemAdd={handleNewMob}
+        placeholder="Add new mob"
+        Icon={AiOutlineUserAdd}
+      />
     </div>
   );
 };

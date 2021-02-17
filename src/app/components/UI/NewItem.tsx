@@ -1,26 +1,30 @@
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Store } from '../../shared/eventTypes';
-import { AiOutlineUserAdd } from 'react-icons/ai';
 import { Button } from "./Button";
+import { IconType } from 'react-icons';
 
-interface NewMobProps {
-  onMobAdd?: (mob: Store['mob'][number]) => void 
+interface NewItemProps {
+  onItemAdd?: (item: {
+    id: string,
+    text: string
+  }) => void,
+  placeholder?: string,
+  Icon: IconType
 }
 
 const MotionBtn = motion.custom(Button);
 
-export const NewMob: React.FC<NewMobProps> = ({ onMobAdd }) =>{
-  const [mobName, setMobName] = useState('');
+export const NewItem: React.FC<NewItemProps> = ({ onItemAdd, placeholder, Icon }) =>{
+  const [itemText, setItemText] = useState('');
   const handleAdd = useCallback(() => {
-    if (mobName && onMobAdd) {
-      onMobAdd({
+    if (itemText && onItemAdd) {
+      onItemAdd({
         id: (+new Date()).toString(),
-        name: mobName
+        text: itemText
       });
-      setMobName('');
+      setItemText('');
     }
-  }, [mobName, onMobAdd]);
+  }, [itemText, onItemAdd]);
   return (
     <div
       style={{
@@ -30,9 +34,9 @@ export const NewMob: React.FC<NewMobProps> = ({ onMobAdd }) =>{
       }}
     >
       <input
-        onChange={e => setMobName(e.target.value)}
-        value={mobName}
-        placeholder="Add New Mob"
+        onChange={e => setItemText(e.target.value)}
+        value={itemText}
+        placeholder={placeholder}
       />
       <MotionBtn
         onClick={handleAdd}
@@ -44,14 +48,14 @@ export const NewMob: React.FC<NewMobProps> = ({ onMobAdd }) =>{
           opacity: 0
         }}
         animate={{
-          x: mobName ? 0 : -50,
-          opacity: mobName ? 1 : 0
+          x: itemText ? 0 : -50,
+          opacity: itemText ? 1 : 0
         }}
         transition={{
           duration: 0.25
         }}
       >
-        <AiOutlineUserAdd />
+        <Icon />
         Add
       </MotionBtn>
     </div>

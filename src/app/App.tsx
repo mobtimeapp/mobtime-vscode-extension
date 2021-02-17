@@ -8,7 +8,7 @@ import { Goals } from './components/Goals';
 import { Overview } from './components/Overview';
 import { Timer } from './components/Timer';
 import { Button } from './components/UI/Button';
-import { Mobs } from './components/UI/Mobs';
+import { Mobs } from './components/Mobs';
 import { Tabs } from './components/UI/Tabs';
 import { Store } from './shared/eventTypes';
 import { useStore } from './StoreProvider';

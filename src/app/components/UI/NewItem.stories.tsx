@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react/types-6-0';
-import { NewMob } from './NewMob';
+import { NewItem } from './NewItem';
+import { AiFillFileAdd } from 'react-icons/ai';
 
 export default {
   title: 'UI / New Mob',
@@ -10,5 +11,5 @@ export default {
 } as Meta;
 
 export const Primary: Story = () => (
-  <NewMob />
+  <NewItem Icon={AiFillFileAdd} placeholder="Add" />
 );

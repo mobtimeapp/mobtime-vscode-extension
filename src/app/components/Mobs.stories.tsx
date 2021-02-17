@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react/types-6-0';
 import { Mobs as MobsList } from './Mobs';
-import { StoreProvider } from '../../StoreProvider';
+import { StoreProvider } from '../StoreProvider';
 
 export default {
   title: 'Sections / Mobs',

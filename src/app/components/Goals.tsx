@@ -1,7 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
+import { VscAdd } from 'react-icons/vsc';
 import { GoalType } from '../shared/eventTypes';
 import { useStore } from '../StoreProvider';
 import { Goal } from './Goal';
+import { NewItem } from './UI/NewItem';
 import { Sortables } from './UI/Sortables';
 
 const placeholders = [
@@ -28,21 +30,42 @@ export const Goals: React.FC = () => {
     });
   }, []);
 
+  const handleNewGoal = useCallback((newItem: {
+    id: string,
+    text: string
+  }) => {
+    handleGoalsUpdate([
+      ...goals,
+      {
+        id: newItem.id,
+        text: newItem.text,
+        completed: false
+      }
+    ]);
+  }, [handleGoalsUpdate, goals]);
+
   return (
-    <Sortables
-      items={goals || []}
-      disableDrag={goals?.length < 2}
-      onItemsUpdate={handleGoalsUpdate}
-      mapItems={mapGoals}
-      children={(goal) => (
-        <Goal 
-          placeholder={goal?.placholder}
-          completed={goal?.completed}
-          id={goal?.id}
-          text={goal?.text}
-          key={goal?.id}
-        />
-      )}
-    />
+    <div>
+      <Sortables
+        items={goals || []}
+        disableDrag={goals?.length < 2}
+        onItemsUpdate={handleGoalsUpdate}
+        mapItems={mapGoals}
+        children={(goal) => (
+          <Goal 
+            placeholder={goal?.placholder}
+            completed={goal?.completed}
+            id={goal?.id}
+            text={goal?.text}
+            key={goal?.id}
+          />
+        )}
+      />
+      <NewItem
+        onItemAdd={handleNewGoal}
+        placeholder="Add New Goal"
+        Icon={VscAdd}
+      />
+    </div>
   );
 };
