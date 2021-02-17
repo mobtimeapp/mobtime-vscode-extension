@@ -8,7 +8,7 @@ import { OptionsButton } from './OptionsButton';
 type SortablesComponent = <A extends { id: string }, MI extends A & { hideOption?: boolean }>(props: {
   items: A[];
   disableDrag?: boolean;
-  onItemsUpdate?: (newMobs: A[]) => void;
+  onItemsUpdate?: (newItems: A[]) => void;
   mapItems: (items: A[]) => MI[];
   children: (item: MI, index: number) => React.ReactChild;
 }) => ReturnType<React.FC>;
@@ -41,9 +41,21 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
     }
   }, [onItemsUpdate, draggedItems]);
 
-  const handleDelete = useCallback((mobId: string) => {
-    setDraggedItems(mobs => {
-      const newItems = mobs.filter(({ id }) => id !== mobId);
+  const handleDelete = useCallback((itemId: string) => {
+    setDraggedItems(items => {
+      const newItems = items.filter(({ id }) => id !== itemId);
+      onItemsUpdate(newItems);
+      return newItems;
+    });
+  }, [onItemsUpdate]);
+
+  const handleSwitch = useCallback((currentIndex: number, direction: 1 | -1) => {
+    setDraggedItems(items => {
+      const newItems = [...items];
+      const currentItem = items[currentIndex];
+      const switchItem = items[currentIndex + direction];
+      newItems[currentIndex + direction] = currentItem;
+      newItems[currentIndex] = switchItem;
       onItemsUpdate(newItems);
       return newItems;
     });
@@ -59,7 +71,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
               .map((item, i) => (
               <Draggable key={item.id} draggableId={item.id.toString()} index={i}>
                 {(provided) => (
-                  <MobNameWrapper 
+                  <ItemWrapper 
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                   >
@@ -93,12 +105,12 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                           options={[
                             {
                               icon: VscChevronUp,
-                              onClick: () => {},
+                              onClick: () => handleSwitch(i, -1),
                               hidden: i === 0
                             },
                             {
                               icon: VscChevronDown,
-                              onClick: () => {},
+                              onClick: () => handleSwitch(i, 1),
                               hidden: (i + 1) === draggedItems.length || draggedItems.length < 2
                             },
                             {
@@ -114,7 +126,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                         />
                       </div>
                     )}
-                  </MobNameWrapper>
+                  </ItemWrapper>
                 )}
               </Draggable>
             ))}
@@ -126,7 +138,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
   );
 };
 
-const MobNameWrapper = styled.div`
+const ItemWrapper = styled.div`
   display: flex;
   width: '100%';
   align-items: flex-start;

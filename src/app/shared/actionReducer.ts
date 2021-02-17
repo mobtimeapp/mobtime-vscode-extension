@@ -4,7 +4,7 @@ import { Actions, Store } from "./eventTypes";
 const defaultState: Store = {
   activeTabIndex: 0,
   settings: {
-    duration: 5000,
+    duration: 300000,
     mobOrder: 'Navigator,Driver'
   },
   goals: [],

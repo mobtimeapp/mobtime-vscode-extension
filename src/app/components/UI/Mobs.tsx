@@ -26,7 +26,8 @@ export const Mobs: React.FC = () => {
     return [...Array(Math.max(orders.length || 0, mobs?.length || 0))].map((_, i) => ({
       id: (mobs[i]?.id || i).toString(),
       name: mobs[i]?.name,
-      type: orders[i]
+      type: orders[i],
+      hideOption: !mobs[i]?.name
     }));
   }
   ,[settings?.mobOrder]);
@@ -64,7 +65,12 @@ export const Mobs: React.FC = () => {
           />
         )}
       />
-      <ActionsButtons>
+      <ActionsButtons
+        style={(mob || []).length < 2 ? {
+          pointerEvents: 'none',
+          opacity: 0.5
+        } : {}}
+      >
         <MotionButton
           initial="rest"
           animate="rest"

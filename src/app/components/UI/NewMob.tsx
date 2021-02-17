@@ -18,6 +18,7 @@ export const NewMob: React.FC<NewMobProps> = ({ onMobAdd }) =>{
         id: (+new Date()).toString(),
         name: mobName
       });
+      setMobName('');
     }
   }, [mobName, onMobAdd]);
   return (
