@@ -4,13 +4,13 @@ import { useMemo } from 'react';
 
 export interface CheckboxProps {
   checked: boolean;
-  onChange?: (checked: boolean) => void;
+  onChange: (checked: boolean) => void;
 } 
 
 export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) => {
   const varient = useMemo(() => checked ? 'ck' : 'notCk', [checked]);
-  const onClick = useCallback(() => onChange && onChange(!checked), [checked]);
-  
+  const onClick = useCallback(() => onChange(!checked), [onChange, checked]);
+
   return (
     <div 
       onClick={onClick}
@@ -47,25 +47,29 @@ export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) =>
           fill="none"
           variants={{
             ck: {
-              d: [
+              d: 
+              [
                 "M 5,10 5,10 5,10",
                 "M 5,10 9,13 9,13",
                 "M 5,10 9,13 18,2",
               ],
-              opacity: [
+              opacity: 
+              [
                 0,
                 1,
                 1,
               ],
             },
             notCk: {
-              d: [
+              d: 
+              [
                 "M 5,10 9,13 18,2",
                 "M 5,10 9,13 9,13",
                 "M 5,10 5,10 5,10",
                 "M 5,10 5,10 5,10",
               ],
-              opacity: [
+              opacity: 
+              [
                 1,
                 1,
                 1,

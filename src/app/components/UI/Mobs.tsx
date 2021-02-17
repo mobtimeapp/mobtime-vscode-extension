@@ -69,7 +69,7 @@ export const Mobs: React.FC<MobsProps> = ({ mobs, order, onUpdateMobs }) => {
 
   const mappedMobs = useMemo(() => {
     const orders = order.split(',');
-    return [...Array(Math.max(orders.length, draggedMobs.length))].map((_, i) => ({
+    return [...Array(Math.max(orders.length, draggedMobs?.length || 0))].map((_, i) => ({
       id: (draggedMobs[i]?.id || i).toString(),
       name: draggedMobs[i]?.name,
       type: orders[i]

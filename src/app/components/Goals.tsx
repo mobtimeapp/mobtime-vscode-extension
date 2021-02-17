@@ -9,7 +9,7 @@ const placeholders = [
   'A great day would be ...'
 ];
 
-export const mapGoals = (goals: GoalType[]): (GoalType & { placholder?: string, hideOption?: boolean })[] => (
+export const mapGoals = (goals: GoalType[] = []): (GoalType & { placholder?: string, hideOption?: boolean })[] => (
   [...Array(Math.max(goals.length, 2))].map((_, i) => ({
     ...goals[i],
     id: goals[i]?.id || `i_${i}`,
@@ -20,11 +20,11 @@ export const mapGoals = (goals: GoalType[]): (GoalType & { placholder?: string, 
 
 export const Goals: React.FC = () => {
   const { state: { goals }, dispatch } = useStore();
-  const mappedGoals = useMemo(() => mapGoals(goals), [goals]);
+  const mappedGoals = useMemo(() => mapGoals(goals || []), [goals]);
   return (
     <Sortables
       items={mappedGoals}
-      disableDrag={goals.length < 2}
+      disableDrag={goals?.length < 2}
       onItemsUpdate={items => dispatch({
         type: 'goals:update',
         goals: items

@@ -44,7 +44,12 @@ const tabs = [
 ];
 
 export const App: React.FC = () => {
-  const { dispatch, state: { activeTabIndex, timerName, mob, settings } } = useStore();
+  const { dispatch, state: { 
+      activeTabIndex, 
+      timerName, 
+      mob,
+      settings,
+   } } = useStore();
 
   const handleDisconnection = useCallback(() => {
     dispatch({ type: 'DISCONNECT' });
@@ -77,7 +82,7 @@ export const App: React.FC = () => {
         >
           <Overview />
           <Mobs 
-            mobs={mob}
+            mobs={mob || []}
             onUpdateMobs={handleMobUpdate}
             order={settings?.mobOrder || ''}
           />

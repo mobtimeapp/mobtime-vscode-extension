@@ -39,12 +39,12 @@ export const Goal: React.FC<GoalProps> = ({
         goals: state.goals?.map(goal => (
           goal.id === id ? {
             ...goal,
-            completed: !completed
+            completed: !goal.completed
           } : goal
         ))
       });
     }
-  }, [id, completed]);
+  }, [id, state.goals]);
 
   return (
     <GoalUI
@@ -56,19 +56,19 @@ export const Goal: React.FC<GoalProps> = ({
   );
 };
 
-export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
+export const GoalUI: React.FC<GoalProps & { onClick: (checked: boolean) => void }> = memo(({
   placeholder,
   completed,
   text,
   onClick
 }) => {
   const rewardRef = useRef<RewardElement>(null);
-  const onChange = (completed: boolean) => {
-    if (completed) {
+  const onChange = useCallback((checked: boolean) => {
+    onClick(checked);
+    if (checked) {
       rewardRef.current?.rewardMe();
     }
-    onClick();
-  };
+  }, [rewardRef.current, onClick]);
 
   return (
     <GoalWrapper
@@ -89,10 +89,11 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
       >
         <Checkbox checked={completed} onChange={onChange} />
       </Reward>
-      <motion.h2
+      <motion.h3
         style={{
           opacity: text ? 1 : 0.5,
-          textDecorationThickness: 3
+          textDecorationThickness: 3,
+          marginTop: 4
         }}
         variants={{
           checked: {
@@ -106,7 +107,7 @@ export const GoalUI: React.FC<GoalProps & { onClick: () => void }> = memo(({
         animate={completed ? 'checked' : 'noChecked'}
       >
         {(text || placeholder)}
-      </motion.h2>
+      </motion.h3>
     </GoalWrapper>
   );
 });

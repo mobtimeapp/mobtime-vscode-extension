@@ -33,7 +33,7 @@ export const Overview: React.FC = () => {
       </TitleContainer>
       {mobOders.map((order, orderIndex) => (
         <MobName 
-          name={mob[orderIndex]?.name}
+          name={mob && mob[orderIndex]?.name}
           key={orderIndex}
           type={order}
           index={orderIndex}
@@ -55,9 +55,9 @@ export const Overview: React.FC = () => {
           Edit Goals
         </Link>
       </TitleContainer>
-      {mapGoals(goals).map(goal => (
+      {mapGoals(goals || []).map(goal => (
         <Goal 
-          placeholder={goal.placholder}
+          placeholder={goal?.placholder}
           text={goal?.text}
           id={goal?.id}
           completed={goal?.completed}

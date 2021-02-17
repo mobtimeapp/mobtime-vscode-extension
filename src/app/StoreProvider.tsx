@@ -11,9 +11,6 @@ import { Loader } from "./components/UI/Loader";
 import { reducerApp } from "./shared/actionReducer";
 import { VSCodeAPI, Store, Actions } from './shared/eventTypes';
 
-declare var vscodeApi: ReturnType<VSCodeAPI>;
-declare var storeData: string;
-
 const StoreContext = createContext({} as {
   state: Store,
   dispatch: Dispatch<Actions>,
@@ -22,8 +19,13 @@ const StoreContext = createContext({} as {
 
 export const useStore = () => useContext(StoreContext);
 
-export const StoreProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(reducerApp, (JSON.parse(storeData) || {}));
+interface StoreProviderProps {
+  vscodeApi?: ReturnType<VSCodeAPI>,
+  initialState?: Store,
+}
+
+export const StoreProvider: React.FC<StoreProviderProps> = ({ children, initialState, vscodeApi }) => {
+  const [state, dispatch] = useReducer(reducerApp, (initialState || {}));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -44,13 +46,12 @@ export const StoreProvider: React.FC = ({ children }) => {
       setLoading(true);
     }
     dispatch(action);
-    vscodeApi.postMessage(action);
+    vscodeApi?.postMessage(action);
   }, [dispatch, vscodeApi, state.timerName]);
 
   return (
     <StoreContext.Provider value={{ state, dispatch: userDispatcher, vscodeApi }}>
-      {loading && <Loader />}
-      {!loading && children}
+      {loading ? <Loader /> : children}
     </StoreContext.Provider>
   );
 };
