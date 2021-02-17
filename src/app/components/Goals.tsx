@@ -30,17 +30,17 @@ export const Goals: React.FC = () => {
     });
   }, []);
 
-  const handleNewGoal = useCallback((newItem: {
+  const handleNewGoal = useCallback((newItems: {
     id: string,
     text: string
-  }) => {
+  }[]) => {
     handleGoalsUpdate([
       ...goals,
-      {
-        id: newItem.id,
-        text: newItem.text,
-        completed: false
-      }
+      ...(newItems.map((item) => ({
+          id: item.id,
+          text: item.text,
+          completed: false
+        })))
     ]);
   }, [handleGoalsUpdate, goals]);
 
@@ -64,7 +64,10 @@ export const Goals: React.FC = () => {
       <NewItem
         onItemAdd={handleNewGoal}
         placeholder="Add New Goal"
+        addMultipleLabel="Add multiple goals"
+        multipleItemPlaceholder={`Add New Goals\nOne goal per line\nAs many as you would like`}
         Icon={VscAdd}
+        addMultiple={true}
       />
     </div>
   );

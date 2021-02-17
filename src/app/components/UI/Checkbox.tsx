@@ -4,23 +4,34 @@ import { useMemo } from 'react';
 
 export interface CheckboxProps {
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  onChange?: (checked: boolean) => void;
+  scale?: number;
+  label?: string;
 } 
 
-export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) => {
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange, scale, label }) => {
   const varient = useMemo(() => checked ? 'ck' : 'notCk', [checked]);
-  const onClick = useCallback(() => onChange(!checked), [onChange, checked]);
+  const onClick = useCallback(() => onChange && onChange(!checked), [onChange, checked]);
 
   return (
-    <div 
+    <motion.div 
       onClick={onClick}
+      initial={false}
+      animate={varient}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        cursor: 'pointer'
+      }}
     >
       <svg 
         width={25}
         height={25}
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 20 20"
-        cursor="pointer"
+        style={{
+          transform: `scale(${scale || 1})`
+        }}
       >
         <motion.circle
           cx={10}
@@ -38,8 +49,6 @@ export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) =>
               strokeDasharray: 50
             }
           }}
-          initial={false}
-          animate={varient}
         />
         <motion.path 
           stroke="var(--vscode-terminal-ansiBrightGreen)"
@@ -78,14 +87,13 @@ export const Checkbox: React.FC<CheckboxProps> = memo(({ checked, onChange }) =>
             }
           }}
           strokeLinecap="round"
-          initial={false}
-          animate={varient}
           transition={{
             type: 'spring',
             duration: 0.2
           }}
         />
       </svg>
-    </div>
+      {label && <p style={{ marginLeft: 5 }}>{label}</p>}
+    </motion.div>
   );
-});
+};

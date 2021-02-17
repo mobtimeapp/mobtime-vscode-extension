@@ -42,16 +42,16 @@ export const Mobs: React.FC = () => {
     handleMobsUpdate(shuffleArray(mob));
   }, [handleMobsUpdate, mob]);
 
-  const handleNewMob = useCallback((newItem: {
+  const handleNewMob = useCallback((newItems: {
     id: string,
     text: string
-  }) => {
+  }[]) => {
     handleMobsUpdate([
       ...mob,
-      {
-        id: newItem.id,
-        name: newItem.text
-      }
+      ...(newItems.map((item) => ({
+          id: item.id,
+          name: item.text
+        })))
     ]);
   }, [handleMobsUpdate, mob]);
 

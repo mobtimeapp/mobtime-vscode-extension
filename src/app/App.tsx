@@ -81,11 +81,7 @@ export const App: React.FC = () => {
           setActiveIndex={handleActiveIndex}
         >
           <Overview />
-          <Mobs 
-            mobs={mob || []}
-            onUpdateMobs={handleMobUpdate}
-            order={settings?.mobOrder || ''}
-          />
+          <Mobs />
           <Goals />
         </Tabs>
       </div>
