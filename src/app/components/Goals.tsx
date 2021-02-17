@@ -1,8 +1,11 @@
-import React, { useCallback } from 'react';
-import { VscAdd } from 'react-icons/vsc';
+import styled from '@emotion/styled';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { VscAdd, VscTrash } from 'react-icons/vsc';
+import Reward, { RewardElement } from 'react-rewards';
 import { GoalType } from '../shared/eventTypes';
 import { useStore } from '../StoreProvider';
 import { Goal } from './Goal';
+import { Button } from './UI/Button';
 import { NewItem } from './UI/NewItem';
 import { Sortables } from './UI/Sortables';
 
@@ -22,6 +25,7 @@ export const mapGoals = (goals: GoalType[] = []): (GoalType & { placholder?: str
 
 export const Goals: React.FC = () => {
   const { state: { goals }, dispatch } = useStore();
+  const rewardRef = useRef<RewardElement>(null);
 
   const handleGoalsUpdate = useCallback((goals: GoalType[]) => {
     dispatch({
@@ -43,6 +47,11 @@ export const Goals: React.FC = () => {
         })))
     ]);
   }, [handleGoalsUpdate, goals]);
+
+  const handleClearGoal = useCallback(() => {
+    handleGoalsUpdate(goals.filter(g => !g.completed));
+    rewardRef.current.rewardMe();
+  }, [goals, handleGoalsUpdate]);
 
   return (
     <div>
@@ -69,6 +78,39 @@ export const Goals: React.FC = () => {
         Icon={VscAdd}
         addMultiple={true}
       />
+      <RewardWrapper>
+        <Reward
+          ref={(ref) => rewardRef.current = ref}
+          type="confetti"
+          config={{
+            elementCount: 200,
+            spread: 50,
+            decay: 0.9,
+            angle: 90,
+            zIndex: 100,
+          }}
+        />
+      </RewardWrapper>
+      {goals.filter(g => g.completed).length > 0 && (
+        <Button 
+          className="secondary"
+          onClick={handleClearGoal}
+          style={{
+            margin: 3
+          }}
+        >
+          <VscTrash />
+          Clear Completed Goals
+        </Button>
+      )}
     </div>
   );
 };
+
+const RewardWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  span {
+    position: fixed;
+  }
+`;

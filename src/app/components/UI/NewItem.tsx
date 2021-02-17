@@ -40,7 +40,9 @@ export const NewItem: React.FC<NewItemProps> = ({
   const handleAdd = useCallback(() => {
     if (itemText && onItemAdd) {
       onItemAdd(
-        itemText.split(/(?:\r\n|\r|\n)/).map((text, i) => ({
+        itemText.split(/(?:\r\n|\r|\n)/)
+        .filter(t => !!t)  
+        .map((text, i) => ({
           id: `${i}${(+new Date()).toString()}`,
           text
         }))

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { DragDropContext, Draggable, DragUpdate, Droppable, DropResult } from 'react-beautiful-dnd';
 import { VscChevronDown, VscChevronUp, VscEdit, VscMenu, VscTrash } from "react-icons/vsc";
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { OptionsButton } from './OptionsButton';
 
 type SortablesComponent = <A extends { id: string }, MI extends A & { hideOption?: boolean }>(props: {
@@ -66,71 +66,89 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
       <Droppable droppableId="items">
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
+            <AnimatePresence>
             {
               mapItems(draggedItems)
               .map((item, i) => (
-              <Draggable key={item.id} draggableId={item.id.toString()} index={i}>
-                {(provided) => (
-                  <ItemWrapper 
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                  >
-                    <motion.div
-                      initial={{ scaleX: 0.75 }}
-                      whileTap={{ scaleY: 0.5 }}
-                      style={{
-                        pointerEvents: disableDrag ? 'none' : 'auto'
+                <Draggable key={item.id} draggableId={item.id.toString()} index={i}>
+                  {(provided) => (
+                    <ItemWrapper 
+                      ref={provided.innerRef}
+                      initial={{
+                        opacity: 0,
+                        x: -100
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0
+                      }}
+                      exit={!item.hideOption ? {
+                        opacity: 0,
+                        x: 100
+                      }: {}}
+                      {...provided.draggableProps}
+                      transition={{
+                        type: 'spring',
+                        duration: 0.5
                       }}
                     >
-                      <div {...provided.dragHandleProps}>
-                        <VscMenu
-                          className="dragIcon"
-                          size={30}
-                        />
-                      </div>
-                    </motion.div>
-                    <div style={{ width: '100%', marginRight: '35px' }}>
-                      {children(item, i)}
-                    </div>
-                    {!item.hideOption && (
-                      <div
+                      <motion.div
+                        initial={{ scaleX: 0.75 }}
+                        whileTap={{ scaleY: 0.5 }}
                         style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          backgroundColor: 'var(--vscode-sideBar-background)'
+                          pointerEvents: disableDrag ? 'none' : 'auto'
                         }}
                       >
-                        <OptionsButton
-                          options={[
-                            {
-                              icon: VscChevronUp,
-                              onClick: () => handleSwitch(i, -1),
-                              hidden: i === 0
-                            },
-                            {
-                              icon: VscChevronDown,
-                              onClick: () => handleSwitch(i, 1),
-                              hidden: (i + 1) === draggedItems.length || draggedItems.length < 2
-                            },
-                            {
-                              icon: VscEdit,
-                              onClick: () => {},
-                            },
-                            {
-                              icon: VscTrash,
-                              onClick: () => handleDelete(item.id),
-                              color: 'var(--vscode-charts-red)'
-                            },
-                          ]}
-                        />
+                        <div {...provided.dragHandleProps}>
+                          <VscMenu
+                            className="dragIcon"
+                            size={30}
+                          />
+                        </div>
+                      </motion.div>
+                      <div style={{ width: '100%', marginRight: '35px' }}>
+                        {children(item, i)}
                       </div>
-                    )}
-                  </ItemWrapper>
-                )}
-              </Draggable>
+                      {!item.hideOption && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            backgroundColor: 'var(--vscode-sideBar-background)'
+                          }}
+                        >
+                          <OptionsButton
+                            options={[
+                              {
+                                icon: VscChevronUp,
+                                onClick: () => handleSwitch(i, -1),
+                                hidden: i === 0
+                              },
+                              {
+                                icon: VscChevronDown,
+                                onClick: () => handleSwitch(i, 1),
+                                hidden: (i + 1) === draggedItems.length || draggedItems.length < 2
+                              },
+                              {
+                                icon: VscEdit,
+                                onClick: () => {},
+                              },
+                              {
+                                icon: VscTrash,
+                                onClick: () => handleDelete(item.id),
+                                color: 'var(--vscode-charts-red)'
+                              },
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </ItemWrapper>
+                  )}
+                </Draggable>
             ))}
             {provided.placeholder}
+            </AnimatePresence>
           </div>
         )}
       </Droppable>
@@ -138,7 +156,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
   );
 };
 
-const ItemWrapper = styled.div`
+const ItemWrapper = styled(motion.div)`
   display: flex;
   width: '100%';
   align-items: flex-start;
