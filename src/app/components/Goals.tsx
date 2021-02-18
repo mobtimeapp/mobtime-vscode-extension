@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { VscAdd, VscTrash } from 'react-icons/vsc';
 import Reward, { RewardElement } from 'react-rewards';
 import { GoalType } from '../shared/eventTypes';

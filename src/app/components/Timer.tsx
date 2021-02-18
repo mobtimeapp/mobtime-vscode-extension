@@ -2,14 +2,32 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../StoreProvider';
 import { millisToMinutes } from '../shared/timeConverter';
 import { Clock } from './Clock';
-import { Button } from './UI/Button';
+import { PlayPauseIcon } from './Icons/PlayPauseIcon';
+import { IconButton as Button } from './UI/OptionsButton';
+import styled from '@emotion/styled';
+import { VscClose } from 'react-icons/vsc';
+import { motion } from 'framer-motion';
 
 export const Timer: React.FC = () => {
   const { dispatch, state: { timerDuration, timerAction, settings } } = useStore();
   const [time, setTime] = useState<number>(0);
   const timer = useRef<NodeJS.Timeout>(null);
+
+  const handlePause = useCallback(() => {
+    dispatch({ type: 'timer:pause', timerDuration: time });
+  }, [dispatch, time]);
+
+  const handleStart = useCallback(() => {
+    dispatch({ type: 'timer:start', timerDuration: time ? time - 1000 : settings?.duration });
+  }, [dispatch, time, settings]);
+
+  const handleClear = useCallback(() => {
+    dispatch({ type: 'timer:complete', timerDuration: 0 });
+  }, [dispatch]);
+
   const countdown = useCallback((time: number) => {
     if (time <= 0) {
+      timer.current && clearInterval(timer.current);
       return 0;
     }
     return time - 1000;
@@ -35,48 +53,42 @@ export const Timer: React.FC = () => {
     }
   }, [timerDuration, timerAction]);
 
-  const handlePause = useCallback(() => {
-    dispatch({ type: 'timer:pause', timerDuration: time });
-  }, [dispatch, time]);
-
-  const handleStart = useCallback(() => {
-    dispatch({ type: 'timer:start', timerDuration: time ? time - 1000 : settings?.duration });
-  }, [dispatch, time, settings]);
-
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'timer:complete', timerDuration: 0 });
-  }, [dispatch]);
-
   return (
-    <>
+    <div style={{ 
+      display: 'flex',
+      justifyContent: 'space-evenly',
+      alignItems: 'center'
+    }}>
+      <IconButton 
+        onClick={timerAction === 'start' ? handlePause : handleStart}
+      >
+        <PlayPauseIcon icon={timerAction !==  'pause' || time > 0 ? 'play' : 'pause'}/>
+      </IconButton>
       <Clock 
-        percentage={timerDuration ? time * 100 / settings?.duration || timerDuration : 0}
+        percentage={timerDuration ? time * 100 / (settings?.duration || timerDuration) : 0}
         time={millisToMinutes(time)}
       />
-      <div style={{ display: 'flex' }}>
-        { timerAction !== 'start' && (
-          <Button
-            onClick={handleStart}
-          >
-            {timerAction === 'pause' ? 'Resume' : 'Start Turn'} 
-          </Button>
-        )}
-        { timerAction === 'start' && (
-          <Button
-            onClick={handlePause}
-          >
-            Pause
-          </Button>
-        )}
-        { time > 0 && (
-          <Button
-            className="secondary"
-            onClick={handleClear}
-          >
-            Clear
-          </Button>
-        )}
-      </div>
-    </>
+      <IconButton 
+        className="secondary"
+        onClick={handleClear} 
+        initial={false} 
+        animate={{
+          opacity: time > 0 ? 1 : 0,
+          pointerEvents: time > 0 ? 'auto' : 'none',
+        }}>
+        <VscClose />
+      </IconButton>
+    </div>
   );
 };
+
+const IconButton = styled(motion.custom(Button))`
+  margin-top: 28px;
+  padding: 10px;
+  width: 35px;
+  height: 35px;
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+`;

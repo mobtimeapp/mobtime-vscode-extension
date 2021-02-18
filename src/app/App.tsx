@@ -10,7 +10,6 @@ import { Timer } from './components/Timer';
 import { Button } from './components/UI/Button';
 import { Mobs } from './components/Mobs';
 import { Tabs } from './components/UI/Tabs';
-import { Store } from './shared/eventTypes';
 import { useStore } from './StoreProvider';
 
 const DashbordView = styled.div`
@@ -46,9 +45,7 @@ const tabs = [
 export const App: React.FC = () => {
   const { dispatch, state: { 
       activeTabIndex, 
-      timerName, 
-      mob,
-      settings,
+      timerName,
    } } = useStore();
 
   const handleDisconnection = useCallback(() => {
@@ -62,12 +59,6 @@ export const App: React.FC = () => {
     });
   }, [dispatch]);
 
-  const handleMobUpdate = useCallback((mob: Store['mob']) => {
-    dispatch({
-      type: 'mob:update',
-      mob
-    });
-  }, []);
 
   return !timerName ? (
     <Connector />

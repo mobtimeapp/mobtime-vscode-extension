@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { useCallback } from "react";
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 

@@ -13,7 +13,7 @@ interface OptionsButtonProps {
   }[];
 }
 
-const IconButton = styled.button`
+export const IconButton = styled.button`
   width: 30px;
   height: 30px;
   justify-content: center;

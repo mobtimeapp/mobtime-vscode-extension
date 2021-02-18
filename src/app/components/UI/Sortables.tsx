@@ -74,14 +74,6 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                   {(provided) => (
                     <ItemWrapper 
                       ref={provided.innerRef}
-                      initial={{
-                        opacity: 0,
-                        x: -100
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0
-                      }}
                       exit={!item.hideOption ? {
                         opacity: 0,
                         x: 100

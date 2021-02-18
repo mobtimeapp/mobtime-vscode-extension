@@ -1,25 +1,6 @@
 import styled from '@emotion/styled';
 import React from 'react';
 
-const Circle = styled.circle`
-  stroke-width: 60px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  stroke-width: 10px;
-  stroke-dasharray: 600;
-  stroke-dashoffset: 255;
-  transform-origin: center;
-  transform: rotate(145deg);
-  stroke: var(--vscode-editorPane-background);
-`;
-
-
-const Time = styled.h1`
-  font-size: 35px;
-  margin-top: -100px;
-  margin-bottom: 40px;
-`;
-
 interface ClockProps {
   percentage: number;
   time: string;
@@ -29,7 +10,6 @@ export const Clock: React.FC<ClockProps> = ({ percentage, time }) => {
   return (
     <div
       style={{
-        width: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -50,7 +30,7 @@ export const Clock: React.FC<ClockProps> = ({ percentage, time }) => {
           />
           <Circle
             style={{
-              strokeDashoffset: percentage ? (255 + ((percentage * 345) / 100)) : 600,
+              strokeDashoffset: percentage ? (255 + ((percentage * 345) / 100)) : 255,
               stroke: 'var(--vscode-terminal-ansiBrightCyan)'
             }}
             cy={100}
@@ -66,3 +46,22 @@ export const Clock: React.FC<ClockProps> = ({ percentage, time }) => {
   );
 };
 
+const Circle = styled.circle`
+  stroke-width: 60px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 10px;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 255;
+  transform-origin: center;
+  transform: rotate(145deg);
+  stroke: var(--vscode-editorPane-background);
+  transition: stroke-dashoffset 1s linear;
+`;
+
+
+const Time = styled.h1`
+  font-size: 35px;
+  margin-top: -100px;
+  margin-bottom: 40px;
+`;

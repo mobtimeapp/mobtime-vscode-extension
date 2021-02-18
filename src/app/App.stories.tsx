@@ -14,7 +14,11 @@ export const Connected: Story = () => {
   return (
     <StoreProvider
       initialState={{
-        timerName: 'test'
+        timerName: 'test',
+        settings: {
+          duration: 5000,
+          mobOrder: 'Navigator,Driver'
+        }
       }}
     >
       <div style={{ width: 350 }}>
