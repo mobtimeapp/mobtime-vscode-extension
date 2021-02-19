@@ -1,7 +1,7 @@
 import React, { HTMLProps } from 'react';
 import styled from '@emotion/styled';
 
-interface InputProps extends HTMLProps<HTMLInputElement> {
+export interface InputProps extends HTMLProps<HTMLInputElement> {
   errorMessage?: string;
 }
 
@@ -33,5 +33,6 @@ export const Underline = styled.div`
 
 export const Error = styled.p`
   margin-top: 4px;
+  font-size: 12px;
   color: red;
 `;

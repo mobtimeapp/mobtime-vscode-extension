@@ -8,6 +8,7 @@ interface OptionsButtonProps {
   options: {
     icon: IconType,
     onClick: () => void,
+    closeOnlick?: boolean,
     color?: string,
     hidden?: boolean
   }[];
@@ -54,7 +55,13 @@ export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) =>
           }}
           key={i} 
           animate={open}
-          onClick={option.onClick}
+          onClick={(e) => {
+            option.onClick();
+            if (option.closeOnlick) {
+              toggleOpen();
+              (e.target as HTMLButtonElement).blur();
+            }
+          }}
           initial={false}
           transition={{
             type: 'spring',

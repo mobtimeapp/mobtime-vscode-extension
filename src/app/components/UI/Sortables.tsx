@@ -10,11 +10,21 @@ type SortablesComponent = <A extends { id: string }, MI extends A & { hideOption
   disableDrag?: boolean;
   onItemsUpdate?: (newItems: A[]) => void;
   mapItems: (items: A[]) => MI[];
-  children: (item: MI, index: number) => React.ReactChild;
+  children: (item: MI & { onEditDone: () => void, isEditing: boolean }, index: number) => React.ReactChild;
 }) => ReturnType<React.FC>;
 
 export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, disableDrag, mapItems }) => {
   const [draggedItems, setDraggedItems] = useState(items);
+  const [editingItems, setEditingItems] = useState<string[]>([]);
+
+  const handleOnEdit = (id: string) => {
+    setEditingItems(ids => [...ids, id]);
+  };
+
+  const handleOnEditDone = (id: string) => {
+    setEditingItems(ids => ids.filter(eId => eId !== id));
+  };
+
   useEffect(() => {
     setDraggedItems(items);
   }, [items]);
@@ -99,7 +109,11 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                         </div>
                       </motion.div>
                       <div style={{ width: '100%', marginRight: '35px' }}>
-                        {children(item, i)}
+                        {children({
+                          ...item,
+                          isEditing: editingItems.includes(item.id),
+                          onEditDone: () => handleOnEditDone(item.id)
+                        }, i)}
                       </div>
                       {!item.hideOption && (
                         <div
@@ -124,7 +138,8 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                               },
                               {
                                 icon: VscEdit,
-                                onClick: () => {},
+                                onClick: () => handleOnEdit(item.id),
+                                closeOnlick: true
                               },
                               {
                                 icon: VscTrash,

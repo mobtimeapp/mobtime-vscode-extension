@@ -55,6 +55,18 @@ export const Mobs: React.FC = () => {
     ]);
   }, [handleMobsUpdate, mob]);
 
+  const handleEditMob = useCallback((id: string, name: string) => {
+    handleMobsUpdate(mob.map(m => {
+      if (m.id === id) {
+        return {
+          ...m,
+          name
+        };
+      }
+      return m;
+    }));
+  }, [handleMobsUpdate, mob]);
+
   return (
     <div style={{ marginTop: '10px' }}>
       <Sortables
@@ -63,11 +75,14 @@ export const Mobs: React.FC = () => {
         onItemsUpdate={handleMobsUpdate}
         mapItems={mapMobs}
         children={(mob, i) => (
-          <MobName 
+          <MobName
             name={mob.name} 
             key={mob.id} 
             index={i}
             type={mob.type}
+            isEditing={mob.isEditing}
+            onEditDone={mob.onEditDone}
+            onMobNameUpdate={(name) => handleEditMob(mob.id, name)}
           />
         )}
       />
