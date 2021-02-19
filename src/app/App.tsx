@@ -11,6 +11,7 @@ import { Button } from './components/UI/Button';
 import { Mobs } from './components/Mobs';
 import { Tabs } from './components/UI/Tabs';
 import { useStore } from './StoreProvider';
+import { Settings } from './components/Settings';
 
 const DashbordView = styled.div`
   display: grid;
@@ -74,6 +75,7 @@ export const App: React.FC = () => {
           <Overview />
           <Mobs />
           <Goals />
+          <Settings />
         </Tabs>
       </div>
       <Button

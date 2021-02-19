@@ -18,7 +18,9 @@ export const Clock: React.FC<ClockProps> = ({ percentage, time }) => {
     >
       <div
         style={{
-          width: '200px',
+          position: 'relative',
+          width: '100%',
+          maxWidth: '200px',
           marginBottom: '-30px',
         }}
       >
@@ -38,10 +40,10 @@ export const Clock: React.FC<ClockProps> = ({ percentage, time }) => {
             r={80}
           />
         </svg>
+        <Time>
+          {time}
+        </Time>
       </div>
-      <Time>
-        {time}
-      </Time>
     </div>
   );
 };
@@ -61,7 +63,9 @@ const Circle = styled.circle`
 
 
 const Time = styled.h1`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 35px;
-  margin-top: -100px;
-  margin-bottom: 40px;
 `;

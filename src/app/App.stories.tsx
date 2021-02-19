@@ -16,7 +16,7 @@ export const Connected: Story = () => {
       initialState={{
         timerName: 'test',
         settings: {
-          duration: 5000,
+          duration: 6000,
           mobOrder: 'Navigator,Driver'
         }
       }}

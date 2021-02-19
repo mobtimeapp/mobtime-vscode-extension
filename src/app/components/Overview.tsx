@@ -9,9 +9,16 @@ import { MobName } from './UI/MobName';
 import { mapGoals } from './Goals';
 
 export const Overview: React.FC = () => {
-  const { state: { settings, mob, goals } } = useStore();
+  const { state: { settings, mob, goals }, dispatch } = useStore();
   const mobOders = useMemo(() => 
     settings?.mobOrder.split(',') || [], [settings?.mobOrder]);
+  
+  const chnageTab = (tabIndex: number) => {
+    dispatch({
+      type: "ACTIVE_TAB",
+      index: tabIndex
+    });
+  };
 
   return (
     <div>
@@ -26,7 +33,9 @@ export const Overview: React.FC = () => {
           />
           Who's up
         </h3>
-        <Link>
+        <Link
+          onClick={() => chnageTab(1)}
+        >
           <AiOutlineEdit style={{ marginRight: 6 }}/>
           Edit Mob
         </Link>
@@ -50,7 +59,9 @@ export const Overview: React.FC = () => {
           />
           Top Goals
         </h3>
-        <Link>
+        <Link
+          onClick={() => chnageTab(2)}
+        >
           <AiOutlineEdit style={{ marginRight: 6 }}/>
           Edit Goals
         </Link>

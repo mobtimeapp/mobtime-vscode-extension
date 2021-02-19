@@ -130,7 +130,7 @@ export const Mobs: React.FC = () => {
   );
 };
 
-const ActionsButtons = styled.div`
+export const ActionsButtons = styled.div`
   display: flex;
   padding-left: 5px;
   button {
