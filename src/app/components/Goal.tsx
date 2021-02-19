@@ -5,9 +5,12 @@ import { GoalType } from '../shared/eventTypes';
 import { Checkbox } from './UI/Checkbox';
 import { motion } from 'framer-motion';
 import Reward, { RewardElement } from 'react-rewards';
+import { EditText } from './UI/EditText';
 
 interface GoalProps extends Partial<GoalType> {
-  placeholder: string
+  placeholder: string;
+  isEditing?: boolean;
+  onEditDone?: () => void;
 }
 
 const GoalWrapper = styled.div`
@@ -29,7 +32,9 @@ export const Goal: React.FC<GoalProps> = ({
   placeholder,
   completed,
   id,
-  text
+  text,
+  isEditing,
+  onEditDone
 }) => {
   const { dispatch, state } = useStore();
   const handleCheck = useCallback(() => {
@@ -46,21 +51,44 @@ export const Goal: React.FC<GoalProps> = ({
     }
   }, [id, state.goals]);
 
+  const handleGoalNameUpdate = useCallback((text: string) => {
+    if (id) {
+      dispatch({
+        type: 'goals:update',
+        goals: state.goals?.map(goal => (
+          goal.id === id ? {
+            ...goal,
+            text
+          } : goal
+        ))
+      });
+    }
+  }, [id, state.goals]);
+
   return (
     <GoalUI
       text={text}
       placeholder={placeholder}
       onClick={handleCheck}
       completed={completed}
+      isEditing={isEditing}
+      onEditDone={onEditDone}
+      onGoalNameUpdate={handleGoalNameUpdate}
     />
   );
 };
 
-export const GoalUI: React.FC<GoalProps & { onClick: (checked: boolean) => void }> = memo(({
+export const GoalUI: React.FC<GoalProps & { 
+  onClick: (checked: boolean) => void;
+  onGoalNameUpdate?: (goal: string) => void; 
+}> = memo(({
   placeholder,
   completed,
   text,
-  onClick
+  onClick,
+  isEditing,
+  onEditDone,
+  onGoalNameUpdate
 }) => {
   const rewardRef = useRef<RewardElement>(null);
   const onChange = useCallback((checked: boolean) => {
@@ -97,16 +125,26 @@ export const GoalUI: React.FC<GoalProps & { onClick: (checked: boolean) => void 
         }}
         variants={{
           checked: {
-            textDecorationLine: 'line-through'
+            textDecorationLine: 'line-through',
+            rotateX: 0,
           },
           noChecked: {
-            textDecorationLine: 'none'
+            textDecorationLine: 'none',
+            rotateX: 0,
           }
         }}
-        initial={false}
+        key={text}
+        initial={{ rotateX: -90 }}
         animate={completed ? 'checked' : 'noChecked'}
       >
-        {(text || placeholder)}
+         {isEditing ? (
+          <EditText 
+            defaultText={text} 
+            onDone={onEditDone}
+            onChange={onGoalNameUpdate} 
+          />) : 
+          (text || placeholder)
+        }
       </motion.h3>
     </GoalWrapper>
   );

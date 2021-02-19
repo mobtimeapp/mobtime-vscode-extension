@@ -67,6 +67,8 @@ export const Goals: React.FC = () => {
             id={goal?.id}
             text={goal?.text}
             key={goal?.id}
+            isEditing={goal.isEditing}
+            onEditDone={goal.onEditDone}
           />
         )}
       />

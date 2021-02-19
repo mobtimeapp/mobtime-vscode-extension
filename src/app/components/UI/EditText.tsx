@@ -64,6 +64,7 @@ const Buttons = styled.div`
     width: 30px;
     height: 30px;
     svg {
+      margin: 0px !important;
       width: 20px;
       height: 20px;
       margin-right: 0px;
