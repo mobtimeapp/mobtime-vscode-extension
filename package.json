@@ -1,8 +1,8 @@
 {
   "name": "mobtime",
-  "displayName": "MobTime",
-  "description": "A COLLABORATIVE TIMER FOR YOUR MOB TEAM",
-  "version": "0.0.1",
+  "displayName": "Mobtime",
+  "description": "A Collaborative Timer For Your Mob Team, https://mobti.me/",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.53.0"
   },
@@ -13,8 +13,9 @@
     "onView:mobtime-sidebar",
     "onStartupFinished"
   ],
+  "publisher": "mobtime",
   "main": "./dist/extension.js",
-  "icon": "./media/icon.png",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/mobtimeapp/mobtime-vscode-extension.git"

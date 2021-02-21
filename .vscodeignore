@@ -6,6 +6,7 @@
 src/**
 .gitignore
 .yarnrc
+node_modules/
 DEVELOPMENT.md
 babal.config.js
 webpack.config.js
