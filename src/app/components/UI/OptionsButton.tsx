@@ -4,44 +4,19 @@ import { IconType } from 'react-icons';
 import styled from '@emotion/styled';
 import { OptionIcon } from '../Icons/OptionIcon';
 
-interface OptionsButtonProps {
-  options: {
-    icon: IconType,
-    onClick: () => void,
-    closeOnlick?: boolean,
-    color?: string,
-    hidden?: boolean
-  }[];
-}
-
-export const IconButton = styled.button`
-  width: 30px;
-  height: 30px;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  svg: {
-    width: 25px;
-    height: 25px;
-    margin-right: 0 !important;
-  }
-`;
-
-const Button = motion.custom(IconButton);
-
 export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) => {
   const [open, toggleOpen] = useCycle('close', 'open');
-  const filterd = useMemo(() => options.filter(o => !o.hidden), [options]);
+  const filtered = useMemo(() => options.filter(o => !o.hidden), [options]);
   return (
     <div
       style={{ display: 'flex', paddingRight: 3 }}
     >
-      {filterd.map((option, i) => (
-        <Button
+      {filtered.map((option, i) => (
+        <IconButton
           className="secondary"
           variants={{
             open: {
-              width: 30,
+              width: 25,
               padding: `6px 4px`,
               marginRight: '5px',
               pointerEvents: 'all'
@@ -57,7 +32,7 @@ export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) =>
           animate={open}
           onClick={(e) => {
             option.onClick();
-            if (option.closeOnlick) {
+            if (option.onClickClose) {
               toggleOpen();
               (e.target as HTMLButtonElement).blur();
             }
@@ -69,17 +44,39 @@ export const OptionsButton: React.FC<OptionsButtonProps> = memo(({ options }) =>
             bounce: 0,
           }}
         >
-          <option.icon size="25px" color={option.color} />
-        </Button>
+          <option.icon color={option.color} />
+        </IconButton>
       ))}
-      <Button 
-        style={{ width: '30px', zIndex: 3 }}
+      <IconButton
         onClick={() => toggleOpen()}
         initial="close"
         animate={open}
       >
         <OptionIcon />
-      </Button>
+      </IconButton>
     </div>
   );
 });
+interface OptionsButtonProps {
+  options: {
+    icon: IconType,
+    onClick: () => void,
+    onClickClose?: boolean,
+    color?: string,
+    hidden?: boolean
+  }[];
+}
+
+export const IconButton = styled(motion.button)`
+  width: 25px;
+  height: 25px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  z-index: 3;
+  svg: {
+    width: 20px;
+    height: 20px;
+    margin-right: 0 !important;
+  }
+`;

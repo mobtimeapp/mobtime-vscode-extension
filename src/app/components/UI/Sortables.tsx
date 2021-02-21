@@ -139,7 +139,7 @@ export const Sortables: SortablesComponent = ({ items, onItemsUpdate, children, 
                               {
                                 icon: VscEdit,
                                 onClick: () => handleOnEdit(item.id),
-                                closeOnlick: true
+                                onClickClose: true
                               },
                               {
                                 icon: VscTrash,

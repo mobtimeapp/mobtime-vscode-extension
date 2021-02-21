@@ -13,36 +13,6 @@ import { Tabs } from './components/UI/Tabs';
 import { useStore } from './StoreProvider';
 import { Settings } from './components/Settings';
 
-const DashbordView = styled.div`
-  display: grid;
-  grid-template-rows: 1fr auto;
-  grid-template-columns: auto;
-  height: 95vh;
-  overflow-x: hidden;
-  :nth-child(1) {
-    overflow-y: auto;
-  }
-`;
-
-const tabs = [
-  {
-    icon: VscEye,
-    label: 'Overview'
-  },
-  {
-    icon: FiUsers,
-    label: 'Mob'
-  },
-  {
-    icon: BsCardChecklist,
-    label: 'Goals'
-  },
-  {
-    icon: VscTools,
-    label: 'Settings'
-  }
-];
-
 export const App: React.FC = () => {
   const { dispatch, state: { 
       mob,
@@ -76,7 +46,7 @@ export const App: React.FC = () => {
     {
       icon: FiUsers,
       label: 'Mob',
-      tooltip: mob?.length.toString() || 0,
+      tooltip: (mob?.length || 0).toString(),
     },
     {
       icon: BsCardChecklist,
@@ -92,7 +62,7 @@ export const App: React.FC = () => {
   return !timerName ? (
     <Connector />
   ) : (
-    <DashbordView>
+    <DashboardView>
       <div>
         <Timer />
         <Tabs
@@ -111,6 +81,19 @@ export const App: React.FC = () => {
       >
         Disconnect
       </Button>  
-    </DashbordView>
+    </DashboardView>
   );
 };
+
+const DashboardView = styled.div`
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: auto;
+  height: 95vh;
+  padding-left: 2px;
+  padding-right: 2px;
+  overflow-x: hidden;
+  :nth-child(1) {
+    overflow-y: auto;
+  }
+`;

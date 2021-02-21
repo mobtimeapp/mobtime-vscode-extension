@@ -54,7 +54,9 @@ export const Goals: React.FC = () => {
   }, [goals, handleGoalsUpdate]);
 
   return (
-    <div>
+    <div
+      style={{ marginTop: '10px' }}
+    >
       <Sortables
         items={goals || []}
         disableDrag={goals?.length < 2}
