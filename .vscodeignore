@@ -1,7 +1,7 @@
 .vscode/**
 .vscode-test/**
 .storybook/**
-.media/**
+.media/vscode-theme-vars.css
 .screenshots/**
 src/**
 .gitignore

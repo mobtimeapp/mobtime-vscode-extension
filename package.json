@@ -14,6 +14,12 @@
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "icon": "./media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobtimeapp/mobtime-vscode-extension.git"
+  },
+  "license": "ISC",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
