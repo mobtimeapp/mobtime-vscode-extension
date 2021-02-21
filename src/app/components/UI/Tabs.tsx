@@ -7,62 +7,12 @@ interface TabsProps {
   tabs: {
     label: string;
     icon: IconType;
+    tooltip?: string;
   }[];
   activeIndex: number;
   children: React.ReactChild[];
   setActiveIndex: (index: number) => void;
 }
-
-const TabsContainer = styled.div`
-  max-width: '100vw';
-  overflow: 'hidden';
-  > div {
-    display: grid;
-    > * {
-      width: 100%;
-      grid-column: 1;
-      grid-row: 1;
-    }
-  }
-`;
-
-const TabsWrapper = styled.div`
-  max-width: '100vw';
-  display: flex;
-`;
-
-const Tab = styled.div`
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: 40px auto;
-  grid-gap: 0px;
-  padding-left: 4px;
-  padding-right: 4px;
-  justify-items: center;
-  align-items: center;
-  width: 100%;
-  cursor: pointer;
-  opacity: 0.4;
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-  p {
-    font-size: 12px;
-  }
-`;
-
-const TabHighlighter = styled.div`
-  display: block;
-  height: 3px;
-  background-color: var(--vscode-button-hoverBackground);
-  margin-top: 10px;
-  margin-bottom: 10px;
-  transform: translateX(-50%);
-`;
-
-const Highlighter = motion.custom(TabHighlighter);
-const MotionTab = motion.custom(Tab);
 
 export const Tabs: React.FC<TabsProps> = memo(({
   tabs,
@@ -77,8 +27,8 @@ export const Tabs: React.FC<TabsProps> = memo(({
   return (
     <>
       <TabsWrapper data-count={tabs.length}>
-        {tabs.map(({ label, icon: Icon }, index) => (
-          <MotionTab
+        {tabs.map(({ label, icon: Icon, tooltip }, index) => (
+          <Tab
             onClick={() => setActiveIndex(index)}
             key={label}
             role="button"
@@ -95,9 +45,14 @@ export const Tabs: React.FC<TabsProps> = memo(({
               duration: 0.4
             }}
           >
+            {!!tooltip && (
+              <TabTooltip>
+                {tooltip}
+              </TabTooltip>
+            )}
             <Icon />
             <p>{label}</p>
-          </MotionTab>
+          </Tab>
         ))}
       </TabsWrapper>
       <Highlighter
@@ -140,3 +95,64 @@ export const Tabs: React.FC<TabsProps> = memo(({
     </>
   );
 });
+
+const TabsContainer = styled.div`
+  max-width: '100vw';
+  overflow: 'hidden';
+  > div {
+    display: grid;
+    > * {
+      width: 100%;
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+`;
+
+const TabsWrapper = styled.div`
+  max-width: '100vw';
+  display: flex;
+`;
+
+const Tab = styled(motion.div)`
+  position: relative;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 40px auto;
+  grid-gap: 0px;
+  padding-left: 4px;
+  padding-right: 4px;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0.4;
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  p {
+    font-size: 12px;
+  }
+`;
+
+const TabTooltip = styled.p`
+  position: absolute;
+  right: 4px;
+  top: -3px;
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-right: 30px;
+  font-size: 12px !important;
+  padding: 2px 8px !important;
+  border-radius: 18px !important;
+`;
+
+const Highlighter = styled(motion.div)`
+  display: block;
+  height: 3px;
+  background-color: var(--vscode-button-hoverBackground);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  transform: translateX(-50%);
+`;

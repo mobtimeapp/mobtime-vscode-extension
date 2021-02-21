@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { BsCardChecklist } from 'react-icons/bs';
 import { FiUsers } from 'react-icons/fi';
 import { VscEye, VscTools } from 'react-icons/vsc';
@@ -45,6 +45,8 @@ const tabs = [
 
 export const App: React.FC = () => {
   const { dispatch, state: { 
+      mob,
+      goals,
       activeTabIndex, 
       timerName,
    } } = useStore();
@@ -60,6 +62,32 @@ export const App: React.FC = () => {
     });
   }, [dispatch]);
 
+  const goalsTooltip = useMemo(() => 
+    `${
+      goals?.filter(g => g.completed).length || 0
+    } / ${goals?.length || 0}`
+  , [goals]);
+
+  const tabs = useMemo(() => [
+    {
+      icon: VscEye,
+      label: 'Overview'
+    },
+    {
+      icon: FiUsers,
+      label: 'Mob',
+      tooltip: mob?.length.toString() || 0,
+    },
+    {
+      icon: BsCardChecklist,
+      label: 'Goals',
+      tooltip: goalsTooltip,
+    },
+    {
+      icon: VscTools,
+      label: 'Settings'
+    }
+  ], [mob?.length, goalsTooltip]);
 
   return !timerName ? (
     <Connector />
