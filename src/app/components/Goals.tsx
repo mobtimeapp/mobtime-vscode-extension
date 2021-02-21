@@ -113,6 +113,6 @@ const RewardWrapper = styled.div`
   display: flex;
   justify-content: center;
   span {
-    position: fixed;
+    position: fixed !important;
   }
 `;

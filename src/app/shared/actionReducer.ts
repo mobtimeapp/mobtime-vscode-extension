@@ -3,6 +3,7 @@ import { Actions, Store } from "./eventTypes";
 
 const defaultState: Store = {
   activeTabIndex: 0,
+  timerAction: 'complete',
   settings: {
     duration: 300000,
     mobOrder: 'Navigator,Driver'

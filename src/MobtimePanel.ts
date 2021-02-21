@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { Disposable } from "vscode";
 import * as Websocket from "ws";
 import { Actions, Store } from "./app/shared/eventTypes";
 import { reducerApp } from "./app/shared/actionReducer";
@@ -9,15 +8,29 @@ type updateStore = (store: Store) => void;
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
+  _store?: Store;
+  _updateStore: updateStore;
+
   socket?: Websocket;
-  updateStore: updateStore;
   time?: number;
   timer?: NodeJS.Timeout;
-  statusBar?: Disposable;
-  store?: Store;
+  connected?: boolean;
+
+  
+  public get store(): Store | undefined {
+    return this._store;
+  }
+  
+  public set store(value: Store | undefined) {
+    this._store = value;
+    if (value) {
+      this._updateStore(value);
+    }
+  }
+  
 
   constructor(updateStore: updateStore, private readonly _extensionUri: vscode.Uri, store?: Store) {
-    this.updateStore = updateStore;
+    this._updateStore = updateStore;
     this.store = store;
     this.connectToSocket();
   }
@@ -40,8 +53,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         this.sendAction({ type: 'client:new' });
         this.socket?.on('message', e => {
           const action = JSON.parse(e.toString());
-          this.timerActionsHandlers(action);
           this.incomingActionsHandlers(action);
+          this.timerActionsHandlers(action);
         });
       });
     }
@@ -69,7 +82,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   public revive(panel: vscode.WebviewView) {
     this._view = panel;
-    this.store;
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -97,7 +109,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         <div id="root"></div>
         <script>
           const vscodeApi = acquireVsCodeApi();
-          const storeData = '${JSON.stringify(this.store)}';
+          const storeData = '${JSON.stringify({...this.store, timerDuration: this.time && this.time - 1000 })}';
         </script>
         <script src="${scriptUri}"></script>
 			</body>
@@ -106,8 +118,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private incomingActionsHandlers (action: Actions) {
     this.store = reducerApp(this.store || {}, action);
-    this.timerActionsHandlers(action);
     switch (action.type) {
+      case 'timer:ownership':
       case 'client:new':
         if (this.store.isOwner) {
           this.sendAction({
@@ -122,13 +134,27 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             type: 'goals:update',
             goals: this.store.goals
           });
+          if (this.store.timerAction === 'start') {
+            this.sendAction({
+              type: "timer:start",
+              timerDuration: this.time
+            });
+          } else if (this.store.timerAction === "pause") {
+            this.sendAction({
+              type: "timer:pause",
+              timerDuration: this.time
+            });
+          } else if (this.store.timerAction === 'complete') {
+            this.sendAction({
+              type: "timer:complete",
+              timerDuration: 0
+            });
+          }
         }
-        break;
       default:
         this.sendUIAction(action);
         break;
     }
-    this.updateStore(this.store);
   }
 
   private outgoingActionsHandlers (action: Actions) {
@@ -155,7 +181,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         this.sendAction(action);
         break;
     }
-    this.updateStore(this.store);
   }
 
   private timerActionsHandlers (actions: Actions) {
@@ -165,26 +190,37 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         if (this.timer) {
           clearInterval(this.timer);
         }
+        this.time = this.time && this.time - 1000;
         this.timer = setInterval(() => {
           if (this.time) {
             const newTime = this.time - 1000;
             this.time = newTime;
-            vscode.window.setStatusBarMessage(`$(watch) Mobtime : ${millisToMinutes(newTime)}`);
+            statusBarMsg(`$(watch) Mobtime : ${millisToMinutes(newTime)}`);
             if (this.time <= 0 && this.timer) {
               clearInterval(this.timer);
-              const [navigator, ...otherMobs] = (this.store?.mob || []);
-              this.sendAction({
-                type: "mob:update",
-                mob: [...otherMobs, navigator],
-              });
-              this.sendUIAction({
-                type: "mob:update",
-                mob: [...otherMobs, navigator],
-              });
-              this.socket?.send(JSON.stringify({ type: "timer:complete" } as Actions));
-              vscode.window.showInformationMessage("!! Timer !!");
-              vscode.window.setStatusBarMessage("");
-              vscode.window.setStatusBarMessage("$(getting-started-item-checked) Mobtime : Completed");
+              if (this.store?.isOwner) {
+                const [navigator, ...otherMobs] = (this.store?.mob || []);
+                const rotateMobOrder = [...otherMobs, navigator];
+                this.store.mob = rotateMobOrder;
+                this.sendAction({
+                  type: "mob:update",
+                  mob: rotateMobOrder,
+                });
+                this.sendUIAction({
+                  type: "mob:update",
+                  mob: rotateMobOrder,
+                });
+                this.sendAction({
+                  type: "timer:complete",
+                  timerDuration: 0,
+                });
+                this.sendUIAction({
+                  type: "timer:complete",
+                  timerDuration: 0,
+                });
+                newMobStatus(rotateMobOrder, this.store.settings?.mobOrder);
+              }
+              timerComplete();
             }
           }
         }, 1000);
@@ -193,20 +229,38 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       case "timer:pause": {
         if (this.timer) {
           clearInterval(this.timer);
-          vscode.window.setStatusBarMessage("$(debug-pause) Mobtime : Pause");
+          statusBarMsg("$(debug-pause) Mobtime : Pause");
         }
         break;
       }
       case "timer:complete": {
         if (this.timer) {
           clearInterval(this.timer);
-          vscode.window.showInformationMessage("!! Timer !!");
-          vscode.window.setStatusBarMessage("$(getting-started-item-checked) Mobtime");
+          timerComplete();
         }
         break;
       }
-      default:
-        break;
+      case "mob:update": {
+        newMobStatus(this.store?.mob, this.store?.settings?.mobOrder);
+      }
     }
   }
+
 }
+
+const statusBarMsg = (message: string) => {
+  vscode.window.setStatusBarMessage(message);
+};
+
+const timerComplete = () => {
+  vscode.window.showInformationMessage("⏰ ⏰ Timer ⏰ ⏰");
+  statusBarMsg("");
+  statusBarMsg("$(getting-started-item-checked) Mobtime : Completed");
+};
+
+const newMobStatus = (mob: Store['mob'], order?: string) => {
+  const mobOrders = order?.split(',');
+  if (mobOrders && mob && mob?.length >= mobOrders.length) {
+    vscode.window.showInformationMessage(`${mobOrders.map((o, i) => `${o}: 👤 ${mob[i].name}`).join(', ')}`);
+  }
+};

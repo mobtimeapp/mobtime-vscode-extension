@@ -38,6 +38,7 @@ export const Timer: React.FC = () => {
       case 'start':
         setTime(timerDuration || 0);
         timer.current && clearInterval(timer.current);
+        setTime(time => time && time - 1000);
         timer.current = setInterval(() => {
           setTime(countdown);
         }, 1000);
@@ -62,7 +63,7 @@ export const Timer: React.FC = () => {
       <IconButton 
         onClick={timerAction === 'start' ? handlePause : handleStart}
       >
-        <PlayPauseIcon icon={timerAction !==  'pause' || time > 0 ? 'play' : 'pause'}/>
+        <PlayPauseIcon icon={timerAction ===  'start' ? 'play' : 'pause'}/>
       </IconButton>
       <Clock 
         percentage={timerDuration ? time * 100 / (settings?.duration || timerDuration) : 0}
