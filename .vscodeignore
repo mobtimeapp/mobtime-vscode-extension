@@ -1,10 +1,14 @@
 .vscode/**
 .vscode-test/**
-out/**
+.storybook/**
+.media/**
+.screenshots/**
 src/**
 .gitignore
 .yarnrc
-vsc-extension-quickstart.md
+DEVELOPMENT.md
+babal.config.js
+webpack.config.js
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
