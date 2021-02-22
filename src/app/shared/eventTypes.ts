@@ -5,6 +5,7 @@ export interface GoalType {
 }
 export interface Store {
   timerName?: string;
+  viewZoom?: number;
   timerServer?: string;
   isOwner?: boolean;
   activeTabIndex?: number;
@@ -44,6 +45,11 @@ type ERROR = {
 type ACTIVE_TAB = {
   type: 'ACTIVE_TAB',
   index: Store['activeTabIndex']
+};
+
+type VIEW_ZOOM = {
+  type: 'VIEW_ZOOM',
+  zoom: number
 };
 
 type TIMER_OWNER = {
@@ -88,6 +94,7 @@ type TIMER_COMPLETE = {
 export type Actions = CONNECT 
   | DISCONNECT 
   | ACTIVE_TAB
+  | VIEW_ZOOM
   | NEW_CLIENT
   | MOB_UPDATE 
   | GOALS_UPDATE 

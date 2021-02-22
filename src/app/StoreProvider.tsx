@@ -29,6 +29,11 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, initialS
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    document.body.style.zoom = `${state.viewZoom || 100}%`;
+    console.log(state.viewZoom);
+  }, [state.viewZoom]);
+
+  useEffect(() => {
     const messageHandler = (e: MessageEvent<Actions>) => {
       if (e.data.type === 'timer:ownership') {
         setLoading(false);

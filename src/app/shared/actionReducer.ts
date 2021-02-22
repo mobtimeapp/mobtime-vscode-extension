@@ -28,6 +28,11 @@ export const reducerApp: Reducer<Store, Actions> = (currentState, action) => {
         ...state,
         activeTabIndex: action.index
       };
+    case 'VIEW_ZOOM':
+      return {
+        ...state,
+        viewZoom: action.zoom
+      };
     case 'timer:pause':
       return {
         ...state,

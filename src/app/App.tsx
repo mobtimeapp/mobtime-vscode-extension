@@ -12,6 +12,7 @@ import { Mobs } from './components/Mobs';
 import { Tabs } from './components/UI/Tabs';
 import { useStore } from './StoreProvider';
 import { Settings } from './components/Settings';
+import { Header } from './components/UI/Header';
 
 export const App: React.FC = () => {
   const { dispatch, state: { 
@@ -64,6 +65,7 @@ export const App: React.FC = () => {
   ) : (
     <DashboardView>
       <div>
+        <Header />
         <Timer />
         <Tabs
           tabs={tabs}
@@ -89,11 +91,8 @@ const DashboardView = styled.div`
   display: grid;
   grid-template-rows: 1fr auto;
   grid-template-columns: auto;
-  height: 95vh;
+  min-height: calc(100vh - 32px);
   padding-left: 2px;
   padding-right: 2px;
   overflow-x: hidden;
-  :nth-child(1) {
-    overflow-y: auto;
-  }
 `;

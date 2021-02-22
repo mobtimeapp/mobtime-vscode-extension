@@ -178,6 +178,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       case "ACTIVE_TAB": {
         break;
       }
+      case "VIEW_ZOOM": {
+        break;
+      }
       default:
         this.sendAction(action);
         break;
