@@ -109,7 +109,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         <div id="root"></div>
         <script>
           const vscodeApi = acquireVsCodeApi();
-          const storeData = '${JSON.stringify({...this.store, timerDuration: this.time && this.time - 1000 })}';
+          const storeData = '${escape(JSON.stringify({...this.store, timerDuration: this.time && this.time - 1000 }))}';
         </script>
         <script src="${scriptUri}"></script>
 			</body>

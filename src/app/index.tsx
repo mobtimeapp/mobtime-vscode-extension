@@ -9,7 +9,7 @@ declare var storeData: string;
 
 ReactDOM.render(
   <StoreProvider
-    initialState={JSON.parse(storeData)}
+    initialState={JSON.parse(unescape(storeData || '{}'))}
     vscodeApi={vscodeApi}
   >
     <App />

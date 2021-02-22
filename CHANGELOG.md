@@ -8,3 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.0.0] - 2021-02-21
 ### Added
 - Mobtime basic sidebar extension
+
+## [1.0.1] - 2021-02-22
+### Fixed
+- Expected characters escaping
