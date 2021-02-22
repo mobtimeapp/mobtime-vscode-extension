@@ -46,9 +46,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private connectToSocket () {
     if (this.store?.timerName) {
       if (this.socket) {
-        this.socket.url;
+        this.socket.close();
       }
-      this.socket = new Websocket(`wss://mobtime.vehikl.com/${this.store.timerName}`);
+      const url = `${this.store.timerServer ? this.store.timerServer.replace(/(https)/, 'wss')+'/' : 'wss://mobti.me/'}${this.store.timerName}`;
+      this.socket = new Websocket(url);
       this.socket.on("open", () => {
         this.sendAction({ type: 'client:new' });
         this.socket?.on('message', e => {

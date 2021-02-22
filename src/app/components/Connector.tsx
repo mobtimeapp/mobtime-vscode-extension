@@ -10,17 +10,20 @@ const Button = motion.custom(ButtonUI);
 export const Connector: React.FC = () => {
   const { dispatch } = useStore();
   const [timerName, setTimerName] = useState<string | undefined>(undefined);
+  const [timerServer, setTimerServer] = useState<string | undefined>(undefined);
 
   const handleInputBlur: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { value } = e.target;
-    setTimerName(parseMobTimeName(value));
+    const { name, server } = parseMobTimeName(value);
+    setTimerName(name);
+    setTimerServer(server);
   };
 
   const handleConnection = useCallback(() => {
     if (timerName) {
-      dispatch({ type: 'CONNECT', name: timerName });
+      dispatch({ type: 'CONNECT', name: timerName, server: timerServer });
     }
-  }, [dispatch, timerName]);
+  }, [dispatch, timerName, timerServer]);
 
   return (
     <>
@@ -28,6 +31,12 @@ export const Connector: React.FC = () => {
         placeholder="Enter MobTime Name / url"
         onChange={handleInputBlur}
       />
+      <p style={{ marginTop: '4px' }}>
+        <strong>Server: </strong>
+        <a href={`${timerServer || 'https://mobti.me'}/${timerName || ''}`}>
+          {timerServer || 'https://mobti.me'}/{timerName}
+        </a>
+      </p>
       <AnimatePresence>
         {timerName && (
           <Button
@@ -50,7 +59,7 @@ export const Connector: React.FC = () => {
             }}
           >
             <VscDebugDisconnect size={20}/> 
-            <p>Connect - {timerName}</p>
+            <p>Connect</p>
           </Button>
         )}
       </AnimatePresence>

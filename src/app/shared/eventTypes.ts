@@ -5,6 +5,7 @@ export interface GoalType {
 }
 export interface Store {
   timerName?: string;
+  timerServer?: string;
   isOwner?: boolean;
   activeTabIndex?: number;
   mob?: {
@@ -22,7 +23,8 @@ export interface Store {
 
 type CONNECT = {
   type: 'CONNECT',
-  name: string
+  name: string,
+  server?: string
 };
 
 type DISCONNECT = {

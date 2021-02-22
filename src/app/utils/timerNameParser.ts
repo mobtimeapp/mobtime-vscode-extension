@@ -1,14 +1,15 @@
-const isValidMobtimeUrl = (url: string) => 
-url.match(/\:\/\/(mobti.me|mobtime.vehikl.com)\//);
-
 export const parseMobTimeName = (value: string) => {
   if (value.length) {
     let name = value;
-    if (isValidMobtimeUrl(value)) {
-      const url = new URL(value);
+    let server;
+    try {
+      const url = new URL(value); 
       name = url.pathname;
+      server = url.origin;
+    } catch (e) {
+      
     }
-    return name.match(/[\w\d._ -]/g)?.join('') || '';
+    return { name: name.match(/[\w\d._ -]/g)?.join('') || '', server };
   }
-  return '';
+  return { name: '' };
 };

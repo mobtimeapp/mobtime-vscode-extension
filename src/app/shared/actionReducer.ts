@@ -19,6 +19,7 @@ export const reducerApp: Reducer<Store, Actions> = (currentState, action) => {
       return {
         ...state, 
         timerName: action.name,
+        timerServer: action.server
       };
     case 'DISCONNECT':
       return {  };
