@@ -18,38 +18,51 @@ export const Timer: React.FC = () => {
   }, [dispatch, time]);
 
   const handleStart = useCallback(() => {
-    dispatch({ type: 'timer:start', timerDuration: time ? time - 1000 : settings?.duration });
+    dispatch({ type: 'timer:start', timerDuration: time ? time : settings?.duration });
   }, [dispatch, time, settings]);
 
   const handleClear = useCallback(() => {
+    dispatch({ type: 'timer:complete', timerDuration: 0 });
+  }, []);
+
+  const handleComplete = useCallback(() => {
     dispatch({ type: 'timer:complete', timerDuration: 0 });
   }, [dispatch]);
 
   const countdown = useCallback((time: number) => {
     if (time <= 0) {
-      timer.current && clearInterval(timer.current);
+      if (timer.current) {
+        clearInterval(timer.current);
+      }
+      handleComplete();
       return 0;
     }
     return time - 1000;
-  }, []);
+  }, [handleComplete]);
 
   useEffect(() => {
     switch (timerAction) {
       case 'start':
         setTime(timerDuration || 0);
-        timer.current && clearInterval(timer.current);
-        setTime(time => time && time - 1000);
+        if (timer.current) {
+          clearInterval(timer.current);
+        }
+        setTime(time => time && time);
         timer.current = setInterval(() => {
-          setTime(countdown);
+          setTime(countdown); 
         }, 1000);
         break;
       case 'pause':
         setTime(timerDuration || 0);
-        timer.current && clearInterval(timer.current);
+        if (timer.current) {
+          clearInterval(timer.current);
+        }
         break;
       case 'complete':
         setTime(0);
-        timer.current && clearInterval(timer.current);
+        if (timer.current) {
+          clearInterval(timer.current);
+        }
         break;
     }
   }, [timerDuration, timerAction]);

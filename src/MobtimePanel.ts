@@ -36,7 +36,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   }
 
   private sendAction (action: Actions) {
-    this.socket?.send(JSON.stringify(action));
+    this.socket?.send(JSON.stringify(
+      action.type === 'timer:complete' ? { type: action.type } : action
+    ));
   }
 
   private sendUIAction (action: Actions) {
@@ -110,7 +112,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         <div id="root"></div>
         <script>
           const vscodeApi = acquireVsCodeApi();
-          const storeData = '${escape(JSON.stringify({...this.store, timerDuration: this.time && this.time - 1000 }))}';
+          const storeData = '${escape(JSON.stringify({...this.store, timerDuration: this.time }))}';
         </script>
         <script src="${scriptUri}"></script>
 			</body>
@@ -194,7 +196,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         if (this.timer) {
           clearInterval(this.timer);
         }
-        this.time = this.time && this.time - 1000;
+        this.time = this.time;
         this.timer = setInterval(() => {
           if (this.time) {
             const newTime = this.time - 1000;
@@ -223,8 +225,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                   timerDuration: 0,
                 });
                 newMobStatus(rotateMobOrder, this.store.settings?.mobOrder);
+                timerComplete();
               }
-              timerComplete();
             }
           }
         }, 1000);
@@ -241,11 +243,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         if (this.timer) {
           clearInterval(this.timer);
           timerComplete();
+          setTimeout(() => {
+            newMobStatus(this.store?.mob, this.store?.settings?.mobOrder);
+          }, 500);
         }
         break;
-      }
-      case "mob:update": {
-        newMobStatus(this.store?.mob, this.store?.settings?.mobOrder);
       }
     }
   }
@@ -265,6 +267,6 @@ const timerComplete = () => {
 const newMobStatus = (mob: Store['mob'], order?: string) => {
   const mobOrders = order?.split(',');
   if (mobOrders && mob && mob?.length >= mobOrders.length) {
-    vscode.window.showInformationMessage(`${mobOrders.map((o, i) => `${o}: 👤 ${mob[i].name}`).join(', ')}`);
+    vscode.window.showInformationMessage(`${mobOrders.map((o, i) => `${o}: 👤  ${mob[i].name}`).join(', ')}`);
   }
 };
