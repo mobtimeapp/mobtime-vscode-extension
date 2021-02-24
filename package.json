@@ -2,7 +2,7 @@
   "name": "mobtime",
   "displayName": "Mobtime",
   "description": "A Collaborative Timer For Your Mob Team, https://mobti.me/",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "engines": {
     "vscode": "^1.53.0"
   },

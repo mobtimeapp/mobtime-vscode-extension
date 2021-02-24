@@ -4,6 +4,9 @@ All notable changes to the "mobtime" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.3] - 2021-02-24
+### Fixed 
+- timer countdown
 
 ## [1.0.2] - 2021-02-22
 ### Added
