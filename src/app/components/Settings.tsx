@@ -1,5 +1,4 @@
-import React, { ChangeEventHandler, useCallback, useMemo, useState } from 'react';
-import { useStore } from '../StoreProvider';
+import React, { ChangeEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 import { TitleContainer } from './UI/Basic';
 import { FiUsers } from 'react-icons/fi';
 import { VscHistory } from 'react-icons/vsc';
@@ -9,13 +8,23 @@ import { Button } from './UI/Button';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled from '@emotion/styled';
 import { Input } from './UI/Input';
+import { useDispatch, useStore } from '../MobtimeProvider';
+import { ExtensionAction } from '../shared/actions';
 
 export const Settings: React.FC = () => {
-  const { state: { settings }, dispatch } = useStore();
+  const { state: { settings } } = useStore();
+  const dispatch = useDispatch();
   const [currentSettings, setSettings] = useState<Store['settings']>({
     duration: settings?.duration ? settings.duration / 60000 : 0,
     mobOrder: settings.mobOrder
   });
+
+  useEffect(() => {
+    setSettings({
+      duration: settings?.duration ? settings.duration / 60000 : 0,
+      mobOrder: settings.mobOrder
+    });
+  }, [settings]);
 
   const isFormUpdated = useMemo(() => 
     currentSettings.duration !== (settings?.duration ? settings.duration / 60000 : 0)
@@ -61,7 +70,7 @@ export const Settings: React.FC = () => {
 
   const handleSubmit = useCallback(() => {
     dispatch({
-      type: 'settings:update',
+      type: ExtensionAction.SET_SETTINGS,
       settings: {
         duration: currentSettings.duration * 60000,
         mobOrder: currentSettings.mobOrder
@@ -70,14 +79,14 @@ export const Settings: React.FC = () => {
           .join(',')
       }
     });
-  }, [currentSettings, dispatch]);
+  }, [currentSettings]);
 
   const handleCancel = useCallback(() => {
     setSettings({
       duration: settings?.duration ? settings.duration / 60000 : 0,
       mobOrder: settings.mobOrder
     });
-  }, [currentSettings, dispatch, settings]);
+  }, [currentSettings, settings]);
 
   return (
     <div>

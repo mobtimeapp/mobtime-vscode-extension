@@ -3,33 +3,33 @@ import React, { useCallback, useMemo } from 'react';
 import { BsCardChecklist } from 'react-icons/bs';
 import { FiUsers } from 'react-icons/fi';
 import { VscEye, VscTools } from 'react-icons/vsc';
-import { Connector } from './components/Connector';
 import { Goals } from './components/Goals';
 import { Overview } from './components/Overview';
 import { Timer } from './components/Timer';
-import { Button } from './components/UI/Button';
 import { Mobs } from './components/Mobs';
 import { Tabs } from './components/UI/Tabs';
-import { useStore } from './StoreProvider';
+import { useDispatch, useStore } from './MobtimeProvider';
 import { Settings } from './components/Settings';
 import { Header } from './components/UI/Header';
+import { ExtensionAction } from './shared/actions';
 
 export const App: React.FC = () => {
-  const { dispatch, state: { 
+  const { 
+    state: { 
       mob,
-      goals,
-      activeTabIndex, 
-      timerName,
-   } } = useStore();
+      goals
+   }, 
+   extensionStore: { 
+     activeTabIndex,
+    } 
+  } = useStore();
 
-  const handleDisconnection = useCallback(() => {
-    dispatch({ type: 'DISCONNECT' });
-  }, [dispatch]);
+  const dispatch = useDispatch();
 
   const handleActiveIndex = useCallback((index: number) => {
     dispatch({
-      type: 'ACTIVE_TAB',
-      index
+      type: ExtensionAction.UPDATE_EXTENSION_STORE,
+      data: { activeTabIndex: index }
     });
   }, [dispatch]);
 
@@ -60,10 +60,7 @@ export const App: React.FC = () => {
     }
   ], [mob?.length, goalsTooltip]);
 
-  return !timerName ? (
-    <Connector />
-  ) : (
-    <DashboardView>
+  return (<DashboardView>
       <div>
         <Header />
         <Timer />
@@ -78,11 +75,6 @@ export const App: React.FC = () => {
           <Settings />
         </Tabs>
       </div>
-      <Button
-        onClick={handleDisconnection}
-      >
-        Disconnect
-      </Button>  
     </DashboardView>
   );
 };

@@ -1,16 +1,19 @@
 import React, { ChangeEventHandler, useCallback, useState } from 'react';
-import { useStore } from '../StoreProvider';
+import { useDispatch } from '../MobtimeProvider';
 import { parseMobTimeName } from '../utils/timerNameParser';
 import { Button as ButtonUI } from './UI/Button';
+import { Loader } from './UI/Loader';
 import { VscDebugDisconnect } from 'react-icons/vsc';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ExtensionAction } from '../shared/actions';
 
 const Button = motion.custom(ButtonUI);
 
 export const Connector: React.FC = () => {
-  const { dispatch } = useStore();
+  const dispatchAction = useDispatch();
   const [timerName, setTimerName] = useState<string | undefined>(undefined);
   const [timerServer, setTimerServer] = useState<string | undefined>(undefined);
+  const [loader, setLoader] = useState(false);
 
   const handleInputBlur: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { value } = e.target;
@@ -21,9 +24,20 @@ export const Connector: React.FC = () => {
 
   const handleConnection = useCallback(() => {
     if (timerName) {
-      dispatch({ type: 'CONNECT', name: timerName, server: timerServer });
+      dispatchAction({ 
+        type: ExtensionAction.CONNECT_MOBTIME,
+        data: {
+          name: timerName,
+          server: timerServer
+        }
+      });
+      setLoader(true);
     }
-  }, [dispatch, timerName, timerServer]);
+  }, [dispatchAction, timerName, timerServer]);
+
+  if (loader) {
+    return <Loader />;
+  }
 
   return (
     <>

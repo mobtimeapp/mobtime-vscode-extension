@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useStore } from '../StoreProvider';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { millisToMinutes } from '../shared/timeConverter';
 import { Clock } from './Clock';
 import { PlayPauseIcon } from './Icons/PlayPauseIcon';
@@ -7,65 +6,63 @@ import { IconButton as Button } from './UI/OptionsButton';
 import styled from '@emotion/styled';
 import { VscClose } from 'react-icons/vsc';
 import { motion } from 'framer-motion';
+import { useDispatch, useStore } from '../MobtimeProvider';
+import { MobtimeState } from '../shared/interfaces';
+import { ExtensionAction } from '../shared/actions';
 
 export const Timer: React.FC = () => {
-  const { dispatch, state: { timerDuration, timerAction, settings } } = useStore();
+  const { state: { settings, timer } } = useStore();
   const [time, setTime] = useState<number>(0);
-  const timer = useRef<NodeJS.Timeout>(null);
+  const ticktok = useRef<NodeJS.Timeout>(null);
+  const dispatch = useDispatch();
+  const timePercentage = useMemo(() => 100 - (settings.duration ? time * 100 / (settings?.duration) : 0), [time, settings.duration]);
 
   const handlePause = useCallback(() => {
-    dispatch({ type: 'timer:pause', timerDuration: time });
-  }, [dispatch, time]);
+    dispatch({ type: ExtensionAction.PAUSE });
+  }, [time]);
 
   const handleStart = useCallback(() => {
-    dispatch({ type: 'timer:start', timerDuration: time ? time : settings?.duration });
-  }, [dispatch, time, settings]);
+    dispatch({ type: ExtensionAction.START });
+  }, [time, settings]);
 
   const handleClear = useCallback(() => {
-    dispatch({ type: 'timer:complete', timerDuration: 0 });
+    dispatch({ type: ExtensionAction.CLEAR });
   }, []);
 
-  const handleComplete = useCallback(() => {
-    dispatch({ type: 'timer:complete', timerDuration: 0 });
-  }, [dispatch]);
-
-  const countdown = useCallback((time: number) => {
-    if (time <= 0) {
-      if (timer.current) {
-        clearInterval(timer.current);
-      }
-      handleComplete();
-      return 0;
+  const updateTimer = useCallback((timer: MobtimeState['timer']) => {
+    if (!timer.startedAt) {
+      setTime(timer.duration);
+      return;
     }
-    return time - 1000;
-  }, [handleComplete]);
+
+    const elapsedTime = Date.now() - (timer.startedAt || 0);
+    const remainingTime = timer.duration - elapsedTime;
+    
+    if (remainingTime <= 0) {
+      if (ticktok.current) {
+        clearInterval(ticktok.current);
+      }
+      setTime(0);
+      return;
+    }
+
+    setTime(remainingTime);
+  }, [settings.duration]);
 
   useEffect(() => {
-    switch (timerAction) {
-      case 'start':
-        setTime(timerDuration || 0);
-        if (timer.current) {
-          clearInterval(timer.current);
-        }
-        setTime(time => time && time);
-        timer.current = setInterval(() => {
-          setTime(countdown); 
-        }, 1000);
-        break;
-      case 'pause':
-        setTime(timerDuration || 0);
-        if (timer.current) {
-          clearInterval(timer.current);
-        }
-        break;
-      case 'complete':
-        setTime(0);
-        if (timer.current) {
-          clearInterval(timer.current);
-        }
-        break;
+    if (ticktok.current) {
+      clearInterval(ticktok.current);
     }
-  }, [timerDuration, timerAction]);
+
+    updateTimer(timer);
+
+    if (timer.startedAt) {
+      ticktok.current = (setInterval(() => {
+        updateTimer(timer);
+      }, 100)) as unknown as NodeJS.Timeout;
+    }
+
+  }, [timer]);
 
   return (
     <div style={{ 
@@ -74,12 +71,14 @@ export const Timer: React.FC = () => {
       alignItems: 'center'
     }}>
       <IconButton 
-        onClick={timerAction === 'start' ? handlePause : handleStart}
+        onClick={timer.startedAt ? handlePause : handleStart}
       >
-        <PlayPauseIcon icon={timerAction ===  'start' ? 'play' : 'pause'}/>
+        <PlayPauseIcon 
+          icon={timer.startedAt ? 'play' : 'pause'}
+        />
       </IconButton>
       <Clock 
-        percentage={timerDuration ? time * 100 / (settings?.duration || timerDuration) : 0}
+        percentage={timePercentage}
         time={millisToMinutes(time)}
       />
       <IconButton 

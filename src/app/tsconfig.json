@@ -1,10 +1,12 @@
 {
   "extends": "./tsconfig.app.json",
-  "types": [
-    "jest",
-    "node",
-    "react"
-  ],
+  "compilerOptions": {
+    "types": [
+      "jest",
+      "node",
+      "react"
+    ],
+  },
   "exclude": ["node_modules"],
   "include": ["**/*.spec.tsx", "**/*.spec.ts"],
 }

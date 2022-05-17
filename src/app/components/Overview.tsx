@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useStore } from '../StoreProvider';
 import { Link, TitleContainer } from './UI/Basic';
 import { FiUsers } from 'react-icons/fi';
 import { AiOutlineEdit } from 'react-icons/ai';
@@ -7,17 +6,18 @@ import { BsCardChecklist } from 'react-icons/bs';
 import { Goal } from './Goal';
 import { MobName } from './UI/MobName';
 import { mapGoals } from './Goals';
+import { useStore } from '../MobtimeProvider';
 
 export const Overview: React.FC = () => {
-  const { state: { settings, mob, goals }, dispatch } = useStore();
+  const { state: { settings, mob, goals } } = useStore();
   const mobOders = useMemo(() => 
     settings?.mobOrder.split(',') || [], [settings?.mobOrder]);
   
   const chnageTab = (tabIndex: number) => {
-    dispatch({
-      type: "ACTIVE_TAB",
-      index: tabIndex
-    });
+    // dispatch({
+    //   type: "ACTIVE_TAB",
+    //   index: tabIndex
+    // });
   };
 
   return (

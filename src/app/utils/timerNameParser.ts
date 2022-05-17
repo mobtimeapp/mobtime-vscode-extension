@@ -5,7 +5,7 @@ export const parseMobTimeName = (value: string) => {
     try {
       const url = new URL(value); 
       name = url.pathname;
-      server = url.origin;
+      server = url.host;
     } catch (e) {
       
     }
