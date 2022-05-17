@@ -28,6 +28,12 @@ type CONNECT = {
   server?: string
 };
 
+type STATE_UPDATE = {
+  type: 'STATE_UPDATE',
+  fullTimerState: Store,
+};
+
+
 type DISCONNECT = {
   type: 'DISCONNECT'
 };
@@ -103,8 +109,10 @@ export type Actions = CONNECT
   | TIMER_START 
   | TIMER_PAUSE 
   | TIMER_COMPLETE
+  | STATE_UPDATE
   | INFO 
-  | ERROR;
+  | ERROR
+  | STATE_UPDATE;
 
 export type VSCodeAPI = <T = unknown>() => {
   getState: () => T;

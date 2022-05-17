@@ -4,6 +4,19 @@ All notable changes to the "mobtime" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.4] - 2022-05-16
+### Added
+- Able to connect different timer on different workspaces
+- Statusbar items to show current timer and ability to pause/resume timer on click
+- Statusbar items to show current connected timer and ability to open mobtime sidebar on click
+- New Notification apear when any timer settings changed along with action to open mobtime sidebar
+- New Notification apear when timer is completed along with action to start next turn
+- Used [`@mobtime/sdk`](https://github.com/mobtimeapp/mobtime-sdk) as a backend for timer
+- Flused UI for timer sidebar
+
+### Fixed
+- connecting to timer
+
 ## [1.0.3] - 2021-02-24
 ### Fixed 
 - timer countdown

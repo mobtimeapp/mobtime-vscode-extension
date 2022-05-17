@@ -6,20 +6,22 @@ import { Store } from '../shared/eventTypes';
 import { motion } from 'framer-motion';
 import { shuffleArray } from '../utils/arraySort';
 import { RandomIcon } from './Icons/RandomIcon';
-import { useStore } from '../StoreProvider';
 import { Sortables } from './UI/Sortables';
 import { MobName } from './UI/MobName';
 import { NewItem } from './UI/NewItem';
 import { Button } from './UI/Button';
+import { useDispatch, useStore } from '../MobtimeProvider';
+import { ExtensionAction } from '../shared/actions';
 
 export const Mobs: React.FC = () => {
-  const { state: { mob, settings }, dispatch } = useStore();
+  const dispatch = useDispatch();
+  const { state: { mob, settings } } = useStore();
   const handleMobsUpdate = useCallback((mob: Store['mob']) => {
     dispatch({
-      type: 'mob:update',
-      mob
+      type: ExtensionAction.SET_MOB,
+      mob,
     });
-  }, [dispatch]);
+  }, []);
 
   const mapMobs = useCallback((mobs: Store['mob'] = []) => {
     const orders = settings?.mobOrder?.split(',') || [];

@@ -9,7 +9,10 @@
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+		"skipLibCheck": true,
+		"allowJs": true,
+		"noImplicitAny": false
 	},
 	"include": [
 		"src/app/shared/**/*.ts",

@@ -1,18 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
-import { VSCodeAPI } from './shared/eventTypes';
-import { StoreProvider } from './StoreProvider';
+import { MobtimeProvider } from './MobtimeProvider';
+import { VSCodeAPI } from './shared/interfaces';
 
 declare var vscodeApi: ReturnType<VSCodeAPI>;
-declare var storeData: string;
+// declare var storeData: string;
 
 ReactDOM.render(
-  <StoreProvider
-    initialState={JSON.parse(unescape(storeData || '{}'))}
+  <MobtimeProvider
     vscodeApi={vscodeApi}
   >
     <App />
-  </StoreProvider>,
+  </MobtimeProvider>,
   document.getElementById('root')
 );

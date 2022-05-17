@@ -2,8 +2,9 @@ import styled from '@emotion/styled';
 import React, { useCallback, useRef } from 'react';
 import { VscAdd, VscTrash } from 'react-icons/vsc';
 import Reward, { RewardElement } from 'react-rewards';
+import { useDispatch, useStore } from '../MobtimeProvider';
+import { ExtensionAction } from '../shared/actions';
 import { GoalType } from '../shared/eventTypes';
-import { useStore } from '../StoreProvider';
 import { Goal } from './Goal';
 import { Button } from './UI/Button';
 import { NewItem } from './UI/NewItem';
@@ -24,13 +25,14 @@ export const mapGoals = (goals: GoalType[] = []): (GoalType & { placholder?: str
 );
 
 export const Goals: React.FC = () => {
-  const { state: { goals }, dispatch } = useStore();
+  const { state: { goals } } = useStore();
+  const dispatch = useDispatch();
   const rewardRef = useRef<RewardElement>(null);
 
   const handleGoalsUpdate = useCallback((goals: GoalType[]) => {
     dispatch({
-      type: 'goals:update',
-      goals: goals
+      type: ExtensionAction.SET_GOALS,
+      goals,
     });
   }, []);
 
@@ -93,6 +95,7 @@ export const Goals: React.FC = () => {
             angle: 90,
             zIndex: 100,
           }}
+          children={null}
         />
       </RewardWrapper>
       {goals.filter(g => g.completed).length > 0 && (

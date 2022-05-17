@@ -1,72 +1,92 @@
 import styled from '@emotion/styled';
 import React, { useCallback } from 'react';
-import { useStore } from './../../StoreProvider';
 import { Button } from './Button';
-import { VscZoomIn, VscZoomOut } from "react-icons/vsc";
+import { VscSyncIgnored, VscZoomIn, VscZoomOut } from "react-icons/vsc";
+import { useDispatch, useStore } from '../../MobtimeProvider';
+import { ExtensionAction } from '../../shared/actions';
 
 export const Header: React.FC = () => {
-  const { state: { timerName, viewZoom }, dispatch } = useStore();
+  const { extensionStore: { timerName, viewZoom } } = useStore();
+  const dispatch = useDispatch();
+
   const handleZoom = useCallback((zoom: number) => {
     dispatch({
-      type:'VIEW_ZOOM',
-      zoom: (viewZoom || 100) + zoom
+      type: ExtensionAction.UPDATE_EXTENSION_STORE,
+      data: { viewZoom: (viewZoom || 100) + zoom }
     });
-  }, [viewZoom]);
+  }, [dispatch, viewZoom]);
+
+  const handleDisconnection = useCallback(() => {
+    dispatch({ type: ExtensionAction.DISCONNECT_MOBTIME });
+  }, [dispatch]);
 
   return (
     <HeaderWrapper>
-      <h3>
-        <strong>
-          {timerName}
-        </strong>
-      </h3>
-      <ButtonsWrapper>
-        <p>
-          {viewZoom || 100}%
-        </p>
-        <IconButton
-          className={!(viewZoom > 100) && "secondary"}
-          onClick={() => handleZoom(5)}
-        >
-          <VscZoomIn />
-        </IconButton>
-        <IconButton
-          className={!(viewZoom < 100) && "secondary"}
-          onClick={() => handleZoom(-5)}
-        >
-          <VscZoomOut />
-        </IconButton>
-      </ButtonsWrapper>
+      <TimerNameWrapper>
+        <h3>
+          <strong>
+            {timerName}
+          </strong>
+        </h3>
+        <ButtonsWrapper>
+          <p>
+            {viewZoom || 100}%
+          </p>
+          <IconButton
+            className={!(viewZoom > 100) && "secondary"}
+            onClick={() => handleZoom(5)}
+          >
+            <VscZoomIn />
+          </IconButton>
+          <IconButton
+            className={!(viewZoom < 100) && "secondary"}
+            onClick={() => handleZoom(-5)}
+          >
+            <VscZoomOut />
+          </IconButton>
+        </ButtonsWrapper>
+      </TimerNameWrapper>
+      <DisconnectButton
+        onClick={handleDisconnection}
+      >
+        <VscSyncIgnored />
+        Disconnect
+      </DisconnectButton>
     </HeaderWrapper>
   );
 };
 
-const HeaderWrapper = styled.div`
+const TimerNameWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 3px;
+  width: 100%;
 `;
 
-const ButtonsWrapper = styled(HeaderWrapper)`
-  justify-content: center;
-  opacity: 0.3;
-  transition: opacity 0.4s ease-in-out;
-  * {
-    margin-right: 6px;
-  }
+const HeaderWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 24px;
+`;
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
   p {
     opacity: 0;
+  }
+  > * {
+    opacity: 0.3;
     transition: opacity 0.4s ease-in-out;
   }
   :hover {
-    opacity: 1;
-    p {
+    > * {
       opacity: 1;
     }
   }
 `;
-
 
 const IconButton = styled(Button)`
   width: 24px;
@@ -77,4 +97,11 @@ const IconButton = styled(Button)`
     height: 20px;
     margin-right: 0px
   }
+`;
+
+const DisconnectButton = styled(Button)`
+  width: max-content;
+  margin-top: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
 `;

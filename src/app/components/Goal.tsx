@@ -1,11 +1,12 @@
 import React, { memo, useCallback, useRef } from 'react';
-import { useStore } from '../StoreProvider';
 import styled from '@emotion/styled';
 import { GoalType } from '../shared/eventTypes';
 import { Checkbox } from './UI/Checkbox';
 import { motion } from 'framer-motion';
 import Reward, { RewardElement } from 'react-rewards';
 import { EditText } from './UI/EditText';
+import { useDispatch, useStore } from '../MobtimeProvider';
+import { ExtensionAction } from '../shared/actions';
 
 interface GoalProps extends Partial<GoalType> {
   placeholder: string;
@@ -36,11 +37,12 @@ export const Goal: React.FC<GoalProps> = ({
   isEditing,
   onEditDone
 }) => {
-  const { dispatch, state } = useStore();
+  const { state } = useStore();
+  const dispatch = useDispatch();
   const handleCheck = useCallback(() => {
     if (id) {
       dispatch({
-        type: 'goals:update',
+        type: ExtensionAction.SET_GOALS,
         goals: state.goals?.map(goal => (
           goal.id === id ? {
             ...goal,
@@ -54,7 +56,7 @@ export const Goal: React.FC<GoalProps> = ({
   const handleGoalNameUpdate = useCallback((text: string) => {
     if (id) {
       dispatch({
-        type: 'goals:update',
+        type: ExtensionAction.SET_GOALS,
         goals: state.goals?.map(goal => (
           goal.id === id ? {
             ...goal,
@@ -66,7 +68,7 @@ export const Goal: React.FC<GoalProps> = ({
   }, [id, state.goals]);
 
   return (
-    <GoalUI
+    <Goals
       text={text}
       placeholder={placeholder}
       onClick={handleCheck}
@@ -78,7 +80,7 @@ export const Goal: React.FC<GoalProps> = ({
   );
 };
 
-export const GoalUI: React.FC<GoalProps & { 
+export const Goals: React.FC<GoalProps & { 
   onClick: (checked: boolean) => void;
   onGoalNameUpdate?: (goal: string) => void; 
 }> = memo(({

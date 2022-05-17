@@ -15,6 +15,11 @@ const defaultState: Store = {
 export const reducerApp: Reducer<Store, Actions> = (currentState, action) => {
   const state = {...defaultState, ...currentState };
   switch (action.type) {
+    case 'STATE_UPDATE':
+      return {
+        ...state, 
+        ...action.fullTimerState
+      };
     case 'CONNECT':
       return {
         ...state, 
